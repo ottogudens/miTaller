@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUDEX Serviteca - Ficha Cliente</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <header class="admin-header"> <img src="logo.png" alt="Logo GUDEX Serviteca" class="logo-admin">
+        <p id="bienvenida-usuario">Bienvenido...</p>
+        <button id="logout-button" class="btn-logout">Cerrar Sesión</button>
+    </header>
+
+    <div class="page-layout"> <nav class="sidebar">
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="#" class="nav-link active" data-view="dashboard">Mi Dashboard</a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-view="vehiculos">Mis Vehículos</a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-view="agendar">Agendar Cita</a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+
+            <div id="view-dashboard" class="content-view active">
+                <div class="dashboard-grid-cliente">
+                    
+                    <section class="card mis-citas">
+                        <h2>Estado de mis Citas</h2>
+                        <ul id="lista-estado-citas">
+                            <li>Cargando citas...</li>
+                        </ul>
+                    </section>
+                    
+                    <section class="card sugerencia-card">
+                        <h2>Próxima Mantención Sugerida</h2>
+                        <div class="sugerencia-contenido">
+                            <p id="proxima-sugerencia-texto">Selecciona un vehículo para ver sugerencias.</p>
+                            <button id="btn-agendar-sugerencia" class="btn-agendar-sugerencia" style="display: none;">
+                                Agendar Servicio
+                            </button>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+
+            <div id="view-vehiculos" class="content-view">
+                <section class="card vehiculo-info">
+                    <h2>Tus Vehículos</h2>
+                    <label for="selector-vehiculo" style="font-weight: bold;">Selecciona un vehículo:</label>
+                    <select id="selector-vehiculo" name="selector-vehiculo" class="selector-vehiculo">
+                        <option value="">Cargando vehículos...</option>
+                    </select>
+                    <h3 id="vehiculo-nombre" style="margin-top: 1rem;"></h3>
+                    <ul id="vehiculo-detalles"></ul>
+                </section>
+
+                <section class="card historial">
+                    <h2>Historial de Mantenciones</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Trabajos Realizados</th>
+                                <th>Repuestos Utilizados</th>
+                                <th>Kilometraje</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historial-tbody">
+                            <tr>
+                                <td colspan="4" style="text-align: center;">Selecciona un vehículo...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+
+            <div id="view-agendar" class="content-view">
+                <section class="card agendar">
+                    <h2>Agendar Próxima Cita</h2>
+                    <p>¿Necesitas una nueva mantención o revisión?</p>
+                    <form id="form-agendar">
+                        <label for="fecha-cita-dia">Selecciona una fecha:</label>
+                        <input type="date" id="fecha-cita-dia" name="fecha-cita-dia" required>
+                        <label for="fecha-cita-hora">Selecciona una hora (L-V 09-18hrs):</label>
+                        <select id="fecha-cita-hora" name="fecha-cita-hora" required>
+                            <option value="">-- Elige una hora --</option>
+                            <option value="09:00">09:00</option>
+                            <option value="10:00">10:00</option>
+                            <option value="11:00">11:00</option>
+                            <option value="12:00">12:00</option>
+                            <option value="13:00">13:00</option>
+                            <option value="14:00">14:00</option>
+                            <option value="15:00">15:00</option>
+                            <option value="16:00">16:00</option>
+                            <option value="17:00">17:00</option>
+                        </select>
+                        <label for="servicio-cita">Motivo de la visita:</label>
+                        <input type="text" id="servicio-cita" name="servicio-cita" placeholder="Ej: Mantención 50.000km" required>
+                        <button type="submit">Solicitar Hora</button>
+                    </form>
+                </section>
+            </div>
+
+        </main>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 GUDEX Serviteca - Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
