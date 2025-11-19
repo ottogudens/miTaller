@@ -83,5 +83,48 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ error: 'Error al eliminar vehículo' });
     }
 });
+// ... (código anterior: create, get historial, update, delete) ...
+
+/**
+ * [R]EAD: BUSCADOR POR PATENTE (NUEVA FUNCIONALIDAD)
+ * Busca el vehículo, trae los datos del dueño y todo su historial de mantenciones.
+ */
+router.get('/buscar/:patente', noCache, async (req, res) => {
+    const patente = req.params.patente.toUpperCase(); // Convertir a mayúsculas
+    
+    try {
+        // 1. Buscar Vehículo y Dueño (JOIN)
+        const vehiculo = await db('vehiculos')
+            .join('clientes', 'vehiculos.cliente_id', '=', 'clientes.id')
+            .where({ 'vehiculos.patente': patente })
+            .select(
+                'vehiculos.*', 
+                'clientes.nombre as cliente_nombre', 
+                'clientes.email as cliente_email',
+                'clientes.telefono as cliente_telefono',
+                'clientes.id as cliente_id_real'
+            )
+            .first();
+
+        if (!vehiculo) {
+            return res.status(404).json({ error: 'Patente no encontrada en el sistema.' });
+        }
+
+        // 2. Buscar Historial de ese vehículo
+        const historial = await db('mantenimientos')
+            .where({ vehiculo_id: vehiculo.id })
+            .orderBy('fecha', 'desc');
+
+        // 3. Responder con todo el paquete de datos
+        res.json({
+            datos: vehiculo,
+            historial: historial
+        });
+
+    } catch (error) {
+        console.error("Error en buscador:", error);
+        res.status(500).json({ error: 'Error interno al buscar vehículo' });
+    }
+});
 
 module.exports = router;
