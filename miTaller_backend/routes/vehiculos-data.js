@@ -10,18 +10,17 @@ const noCache = (req, res, next) => {
 
 // --- MARCAS ---
 
-// [R]EAD: Obtener todas las marcas (con ID)
+// Leer todas
 router.get('/marcas', noCache, async (req, res) => {
     try {
-        // Devolvemos ID y Nombre para poder gestionar
         const marcas = await db('marcas').select('id', 'nombre').orderBy('nombre', 'asc');
         res.json(marcas);
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener las marcas' });
+        res.status(500).json({ error: 'Error marcas' });
     }
 });
 
-// [C]REATE: Crear Marca
+// Crear Marca
 router.post('/marcas', async (req, res) => {
     const { nombre } = req.body;
     if (!nombre) return res.status(400).json({ error: 'Nombre requerido' });
@@ -29,40 +28,37 @@ router.post('/marcas', async (req, res) => {
         await db('marcas').insert({ nombre });
         res.status(201).json({ message: 'Marca creada' });
     } catch (error) {
-        res.status(500).json({ error: 'Error al crear (¿Duplicada?)' });
+        res.status(500).json({ error: 'Error crear marca' });
     }
 });
 
-// [D]ELETE: Eliminar Marca
+// Borrar Marca
 router.delete('/marcas/:id', async (req, res) => {
     try {
         await db('marcas').where({ id: req.params.id }).del();
         res.json({ message: 'Marca eliminada' });
     } catch (error) {
-        res.status(500).json({ error: 'Error al eliminar' });
+        res.status(500).json({ error: 'Error eliminar marca' });
     }
 });
 
 // --- MODELOS ---
 
-// [R]EAD: Obtener modelos por nombre de marca (Para el select del formulario)
+// Leer modelos por nombre de marca (Para el formulario de vehículos)
 router.get('/modelos/:marcaNombre', noCache, async (req, res) => {
-    const { marcaNombre } = req.params;
     try {
         const modelos = await db('modelos')
             .join('marcas', 'modelos.marca_id', '=', 'marcas.id')
-            .where('marcas.nombre', marcaNombre)
+            .where('marcas.nombre', req.params.marcaNombre)
             .select('modelos.nombre')
             .orderBy('modelos.nombre', 'asc');
-        
-        // Retornamos solo array de strings para compatibilidad con lo existente
         res.json(modelos.map(m => m.nombre));
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener los modelos' });
+        res.status(500).json({ error: 'Error modelos' });
     }
 });
 
-// [R]EAD: Obtener modelos por ID de marca (Para la gestión)
+// Leer modelos por ID de marca (Para el panel de configuración)
 router.get('/modelos-by-id/:marcaId', noCache, async (req, res) => {
     try {
         const modelos = await db('modelos')
@@ -71,29 +67,29 @@ router.get('/modelos-by-id/:marcaId', noCache, async (req, res) => {
             .orderBy('nombre', 'asc');
         res.json(modelos);
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener modelos' });
+        res.status(500).json({ error: 'Error modelos ID' });
     }
 });
 
-// [C]REATE: Crear Modelo
+// Crear Modelo
 router.post('/modelos', async (req, res) => {
     const { nombre, marca_id } = req.body;
-    if (!nombre || !marca_id) return res.status(400).json({ error: 'Datos incompletos' });
+    if (!nombre || !marca_id) return res.status(400).json({ error: 'Faltan datos' });
     try {
         await db('modelos').insert({ nombre, marca_id });
         res.status(201).json({ message: 'Modelo creado' });
     } catch (error) {
-        res.status(500).json({ error: 'Error al crear modelo' });
+        res.status(500).json({ error: 'Error crear modelo' });
     }
 });
 
-// [D]ELETE: Eliminar Modelo
+// Borrar Modelo
 router.delete('/modelos/:id', async (req, res) => {
     try {
         await db('modelos').where({ id: req.params.id }).del();
         res.json({ message: 'Modelo eliminado' });
     } catch (error) {
-        res.status(500).json({ error: 'Error al eliminar' });
+        res.status(500).json({ error: 'Error eliminar modelo' });
     }
 });
 

@@ -68,7 +68,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card"><h3>Historial</h3><ul id="res-lista-historial" class="lista-citas"></ul></div>
+                    <div class="card"><h3>Historial de Mantenciones</h3><ul id="res-lista-historial" class="lista-citas"></ul></div>
                 </div>
             </div>
 
@@ -80,36 +80,56 @@
                             <form id="form-crear-cliente">
                                 <label>Nombre:</label><input type="text" id="admin-nombre" required>
                                 <label>Email:</label><input type="email" id="admin-email" required>
-                                <label>Pass:</label><input type="password" id="admin-password" required>
-                                <label>Tel:</label><input type="tel" id="admin-telefono">
+                                <label>Contraseña:</label><input type="password" id="admin-password" required>
+                                <label>Teléfono:</label><input type="tel" id="admin-telefono">
                                 <label>Rol:</label><select id="admin-role"><option value="cliente">Cliente</option><option value="admin">Admin</option></select>
-                                <button type="submit">Crear</button>
+                                <button type="submit">Crear Cliente</button>
                             </form>
                         </div>
-                        <div class="card"><h3>Clientes</h3><ul id="lista-clientes-ul"><li>Cargando...</li></ul></div>
+                        <div class="card"><h3>Lista de Clientes</h3><ul id="lista-clientes-ul"><li>Cargando...</li></ul></div>
                     </section>
                     
                     <section class="admin-column hidden" id="columna-detalles">
                         <div class="card">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <h3 id="detalle-cliente-nombre">Cliente</h3>
-                                <button id="btn-pdf-cliente" class="btn-descargar" style="margin: 0; font-size: 0.8rem; padding: 0.4rem;">📄 Ficha PDF</button>
+                                <button id="btn-pdf-cliente" class="btn-descargar" style="margin:0; font-size:0.8rem; padding: 0.4rem;">📄 PDF</button>
                             </div>
                             <p id="detalle-cliente-info"></p>
                         </div>
                         
-                        <div class="card admin-form"><h3>Vehículo</h3><form id="form-agregar-vehiculo"><label>Patente:</label><input type="text" id="admin-patente" required><label>Marca:</label><select id="admin-marca" required></select><label>Modelo:</label><select id="admin-modelo" required></select><label>Año:</label><input type="number" id="admin-anio"><button type="submit">Agregar</button></form></div>
-                        <div class="card"><h3>Lista Vehículos</h3><ul id="lista-vehiculos-ul"></ul></div>
-                        <div class="card admin-form"><h3>Mantenimiento</h3><form id="form-agregar-mantenimiento"><label>Fecha:</label><input type="date" id="admin-mantenimiento-fecha" required><label>KM:</label><input type="number" id="admin-mantenimiento-km"><label>Trabajo:</label><textarea id="admin-mantenimiento-trabajos" required></textarea><label>Repuestos:</label><textarea id="admin-mantenimiento-repuestos"></textarea><label>Sugerencia:</label><textarea id="admin-mantenimiento-sugerencia"></textarea><label>Prox KM:</label><input type="number" id="admin-mantenimiento-prox-km"><button type="submit">Registrar</button></form></div>
-                        <div class="card"><h3>Historial</h3><ul id="lista-historial-ul"></ul></div>
+                        <div class="card admin-form"><h3>Agregar Vehículo</h3><form id="form-agregar-vehiculo"><label>Patente:</label><input type="text" id="admin-patente" required><label>Marca:</label><select id="admin-marca" required></select><label>Modelo:</label><select id="admin-modelo" required></select><label>Año:</label><input type="number" id="admin-anio"><button type="submit">Agregar Vehículo</button></form></div>
+                        
+                        <div class="card"><h3>Vehículos</h3><ul id="lista-vehiculos-ul"><li>Selecciona un cliente...</li></ul></div>
+                        
+                        <div class="card admin-form" style="border: 2px solid #007bff; background-color: #f0f8ff;">
+                            <h3 style="color: #007bff; border-bottom-color: #cce5ff;">Agendar Cita</h3>
+                            <p style="font-size: 0.8rem; color: #666; margin-top: -10px;">Para el vehículo seleccionado arriba.</p>
+                            <form id="form-admin-agendar-cita">
+                                <label>Fecha:</label><input type="date" id="admin-cita-fecha" required>
+                                <label>Hora:</label>
+                                <select id="admin-cita-hora" required>
+                                    <option value="">-- Selecciona Hora --</option>
+                                    <option value="09:00">09:00</option><option value="10:00">10:00</option>
+                                    <option value="11:00">11:00</option><option value="12:00">12:00</option>
+                                    <option value="13:00">13:00</option><option value="14:00">14:00</option>
+                                    <option value="15:00">15:00</option><option value="16:00">16:00</option>
+                                    <option value="17:00">17:00</option>
+                                </select>
+                                <label>Servicio Solicitado:</label><input type="text" id="admin-cita-servicio" required placeholder="Ej: Revisión de frenos">
+                                <button type="submit" style="background-color: #007bff;">Agendar Cita</button>
+                            </form>
+                        </div>
+                        <div class="card admin-form"><h3>Registrar Mantenimiento</h3><form id="form-agregar-mantenimiento"><label>Fecha:</label><input type="date" id="admin-mantenimiento-fecha" required><label>KM:</label><input type="number" id="admin-mantenimiento-km"><label>Trabajos:</label><textarea id="admin-mantenimiento-trabajos" rows="3" required></textarea><label>Repuestos:</label><textarea id="admin-mantenimiento-repuestos" rows="2"></textarea><label>Sugerencia:</label><textarea id="admin-mantenimiento-sugerencia" rows="2"></textarea><label>Próximo KM:</label><input type="number" id="admin-mantenimiento-prox-km"><button type="submit">Registrar</button></form></div>
+                        <div class="card"><h3>Historial</h3><ul id="lista-historial-ul"><li>Selecciona un vehículo...</li></ul></div>
                     </section>
                 </div>
             </div>
 
             <div id="view-config-vehiculos" class="content-view">
                 <div class="admin-container-clientes">
-                    <section class="admin-column"><div class="card admin-form"><h3>Agregar Marca</h3><form id="form-crear-marca"><label>Nombre Marca:</label><div style="display:flex; gap:10px;"><input type="text" id="nueva-marca-nombre" required><button type="submit" style="margin:0;">Añadir</button></div></form></div><div class="card"><h3>Marcas</h3><ul id="lista-config-marcas" class="config-list"><li>Cargando...</li></ul></div></section>
-                    <section class="admin-column"><div class="card"><h3 id="titulo-modelos-marca">Modelos</h3><div id="panel-modelos" class="hidden"><form id="form-crear-modelo" style="margin-bottom:1rem;"><label>Nuevo Modelo:</label><div style="display:flex; gap:10px;"><input type="text" id="nuevo-modelo-nombre" required><button type="submit" style="margin:0;">Añadir</button></div></form><ul id="lista-config-modelos" class="config-list"></ul></div></div></section>
+                    <section class="admin-column"><div class="card admin-form"><h3>Agregar Marca</h3><form id="form-crear-marca"><label>Nombre Marca:</label><div style="display: flex; gap: 10px;"><input type="text" id="nueva-marca-nombre" required placeholder="Ej: Ferrari"><button type="submit" style="margin-top: 0;">Añadir</button></div></form></div><div class="card"><h3>Listado de Marcas</h3><ul id="lista-config-marcas" class="config-list"><li>Cargando...</li></ul></div></section>
+                    <section class="admin-column"><div class="card"><h3 id="titulo-modelos-marca">Modelos</h3><p id="info-modelos-marca">Selecciona una marca.</p><div id="panel-modelos" class="hidden"><form id="form-crear-modelo" style="margin-bottom: 1rem;"><label>Nuevo Modelo:</label><div style="display: flex; gap: 10px;"><input type="text" id="nuevo-modelo-nombre" required placeholder="Ej: Enzo"><button type="submit" style="margin-top: 0;">Añadir</button></div></form><ul id="lista-config-modelos" class="config-list"></ul></div></div></section>
                 </div>
             </div>
 

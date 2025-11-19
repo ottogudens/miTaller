@@ -4,12 +4,13 @@ let usuarioLogueado = null;
 let clienteSeleccionadoId = null; 
 let vehiculoSeleccionadoId = null; 
 let marcasData = [];
-let marcaSeleccionadaId = null;
 
-// DOM
+// Variables DOM
 let colDetalles, listaClientesUL, listaVehiculosUL, listaHistorialUL;
-let detalleNombre, detalleInfo, btnPdfCliente; // <-- RECUPERADO
-let formCrearCliente, formAgregarVehiculo, logoutButton, formAgregarMantenimiento;
+let detalleNombre, detalleInfo, btnPdfCliente, formCrearCliente, formAgregarVehiculo, logoutButton, formAgregarMantenimiento;
+// NUEVO: Variable para formulario de agendar cita desde admin
+let formAdminAgendarCita;
+
 let mantenimientoModal, closeMantenimientoModalBtn, formEditMantenimiento, overlay;
 let clienteModal, closeClienteModalBtn, formEditCliente;
 let vehiculoModal, closeVehiculoModalBtn, formEditVehiculo;
@@ -17,7 +18,7 @@ let listaCitasPendientesUL, listaCitasConfirmadasUL, listaCitasTerminadasUL;
 let formBackupRestore, btnDescargarBackup, inputFileBackup, formExcelRestore, btnDescargarExcel, inputFileExcel;
 let sidebarLinks, contentViews, selectMarca, selectModelo;
 let formBuscadorPatente, resultadoBusqueda, btnIrCliente;
-let formCrearMarca, listaConfigMarcas, formCrearModelo, listaConfigModelos, panelModelos, tituloModelosMarca;
+let formCrearMarca, listaConfigMarcas, formCrearModelo, listaConfigModelos, panelModelos, tituloModelosMarca, marcaSeleccionadaId;
 
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('gudexToken');
@@ -30,18 +31,21 @@ document.addEventListener('DOMContentLoaded', () => {
     tokenGuardado = token;
     usuarioLogueado = usuario;
 
-    // ASIGNACIÓN DOM
+    // --- ASIGNACIÓN DOM ---
     colDetalles = document.getElementById('columna-detalles');
     listaClientesUL = document.getElementById('lista-clientes-ul');
     listaVehiculosUL = document.getElementById('lista-vehiculos-ul');
     listaHistorialUL = document.getElementById('lista-historial-ul');
     detalleNombre = document.getElementById('detalle-cliente-nombre');
     detalleInfo = document.getElementById('detalle-cliente-info');
-    btnPdfCliente = document.getElementById('btn-pdf-cliente'); // <-- ASIGNADO
+    btnPdfCliente = document.getElementById('btn-pdf-cliente');
     
     formCrearCliente = document.getElementById('form-crear-cliente');
     formAgregarVehiculo = document.getElementById('form-agregar-vehiculo');
     formAgregarMantenimiento = document.getElementById('form-agregar-mantenimiento');
+    // NUEVO
+    formAdminAgendarCita = document.getElementById('form-admin-agendar-cita');
+
     logoutButton = document.getElementById('logout-button');
     
     overlay = document.getElementById('modal-overlay');
@@ -81,6 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
     listaConfigModelos = document.getElementById('lista-config-modelos');
     panelModelos = document.getElementById('panel-modelos');
     tituloModelosMarca = document.getElementById('titulo-modelos-marca');
+    
+    // Configurar fecha mínima para citas admin
+    const fechaCitaInput = document.getElementById('admin-cita-fecha');
+    if(fechaCitaInput) fechaCitaInput.min = new Date().toISOString().split('T')[0];
 
     iniciarPanelAdmin();
 });
@@ -103,11 +111,14 @@ function iniciarPanelAdmin() {
     formCrearCliente.addEventListener('submit', handleCrearCliente);
     formAgregarVehiculo.addEventListener('submit', handleAgregarVehiculo);
     formAgregarMantenimiento.addEventListener('submit', handleAgregarMantenimiento);
+    
+    // NUEVO LISTENER
+    if(formAdminAgendarCita) formAdminAgendarCita.addEventListener('submit', handleAdminAgendarCita);
+
     logoutButton.addEventListener('click', handleCerrarSesion);
     selectMarca.addEventListener('change', () => poblarSelectModelos(selectMarca.value));
     
-    if(btnPdfCliente) btnPdfCliente.addEventListener('click', handleDescargarFichaCliente); // <-- LISTENER ACTIVADO
-
+    if(btnPdfCliente) btnPdfCliente.addEventListener('click', handleDescargarFichaCliente);
     if(formBuscadorPatente) formBuscadorPatente.addEventListener('submit', handleBuscarPatente);
     if(formCrearMarca) formCrearMarca.addEventListener('submit', handleCrearMarca);
     if(formCrearModelo) formCrearModelo.addEventListener('submit', handleCrearModelo);
@@ -136,14 +147,48 @@ function showView(viewId) {
     if(link) link.classList.add('active');
 }
 
-// --- PDF ---
-async function handleDescargarFichaCliente() {
-    if (!clienteSeleccionadoId) return alert('Selecciona un cliente primero.');
-    const url = `${API_URL}/reports/cliente/${clienteSeleccionadoId}?token=${tokenGuardado}`;
-    window.open(url, '_blank');
+// --- AGENDAR CITA (ADMIN) ---
+async function handleAdminAgendarCita(e) {
+    e.preventDefault();
+    if (!clienteSeleccionadoId || !vehiculoSeleccionadoId) {
+        alert('Debes seleccionar un cliente y luego un vehículo (haz clic en la lista de vehículos).');
+        return;
+    }
+
+    const fecha = document.getElementById('admin-cita-fecha').value;
+    const hora = document.getElementById('admin-cita-hora').value;
+    const servicio = document.getElementById('admin-cita-servicio').value;
+
+    const datosCita = {
+        fecha_cita: `${fecha}T${hora}:00`,
+        servicio_solicitado: servicio,
+        cliente_id: clienteSeleccionadoId,
+        vehiculo_id: vehiculoSeleccionadoId
+    };
+
+    try {
+        const res = await fetch(`${API_URL}/citas`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${tokenGuardado}` },
+            body: JSON.stringify(datosCita)
+        });
+        
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || 'Error al agendar');
+        }
+
+        alert('Cita agendada exitosamente.');
+        formAdminAgendarCita.reset();
+        cargarDashboardCitas(); // Actualizar dashboard
+
+    } catch (error) {
+        alert(error.message);
+    }
 }
 
-// --- CRUD MARCAS ---
+
+// --- CRUD MARCAS/MODELOS ---
 async function cargarConfigMarcas() {
     try {
         const res = await fetch(`${API_URL}/vehiculos-data/marcas`, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
@@ -152,7 +197,8 @@ async function cargarConfigMarcas() {
         marcas.forEach(m => {
             const li = document.createElement('li');
             const nombre = m.nombre || m;
-            const id = m.id || null;
+            const id = m.id;
+            
             li.innerHTML = `<span>${nombre}</span> <button class="btn-delete" type="button">X</button>`;
             li.querySelector('button').onclick = (e) => { e.stopPropagation(); window.borrarMarca(id); };
             li.onclick = () => {
@@ -178,7 +224,7 @@ async function handleCrearMarca(e) {
 }
 
 window.borrarMarca = async (id) => {
-    if(!confirm('¿Borrar marca y TODOS sus modelos?')) return;
+    if(!confirm('¿Borrar marca y modelos?')) return;
     await fetch(`${API_URL}/vehiculos-data/marcas/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${tokenGuardado}` } });
     cargarConfigMarcas(); panelModelos.classList.add('hidden'); cargarDatosDeVehiculos();
 };
@@ -193,7 +239,6 @@ async function seleccionarMarcaConfig(id, nombre) {
 
 async function cargarConfigModelos(marcaId) {
     const res = await fetch(`${API_URL}/vehiculos-data/modelos-by-id/${marcaId}`, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
-    if(!res.ok) { listaConfigModelos.innerHTML = '<li>Error carga</li>'; return; }
     const modelos = await res.json();
     listaConfigModelos.innerHTML = modelos.length ? '' : '<li>Sin modelos.</li>';
     modelos.forEach(m => {
@@ -230,35 +275,26 @@ async function handleBuscarPatente(e) {
         const res = await fetch(`${API_URL}/vehiculos/buscar/${patente}`, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
         if (!res.ok) { resultadoBusqueda.classList.add('hidden'); return alert('No encontrado'); }
         const data = await res.json();
-        const v = data.datos; 
-        const h = data.historial || [];
-        
+        const v = data.datos; const h = data.historial || [];
         document.getElementById('res-patente').textContent = v.patente;
         document.getElementById('res-marca-modelo').textContent = `${v.marca} ${v.modelo}`;
         document.getElementById('res-anio').textContent = v.anio || 'N/A';
         document.getElementById('res-cliente').textContent = v.cliente_nombre;
         document.getElementById('res-email').textContent = v.cliente_email;
         document.getElementById('res-telefono').textContent = v.cliente_telefono;
-        
-        btnIrCliente.onclick = () => {
-            showView('clientes');
-            window.seleccionarCliente(v.cliente_id_real || v.cliente_id);
-        };
-
-        const ul = document.getElementById('res-lista-historial'); 
-        ul.innerHTML = h.length ? '' : '<li>Sin historial.</li>';
-        h.forEach(m => {
-            const li = document.createElement('li'); li.className = 'list-item';
-            li.innerHTML = `<p><strong>${m.fecha}</strong> (${m.kilometraje}km)<br>
-                            Trabajo: ${m.trabajos_realizados}<br>
-                            <em>Repuestos: ${m.repuestos_usados || 'N/A'}</em></p>`;
-            ul.appendChild(li);
-        });
+        btnIrCliente.onclick = () => { showView('clientes'); window.seleccionarCliente(v.cliente_id_real || v.cliente_id); };
+        const ul = document.getElementById('res-lista-historial'); ul.innerHTML = h.length ? '' : '<li>Sin historial.</li>';
+        h.forEach(m => { const li = document.createElement('li'); li.className = 'list-item'; li.innerHTML = `<p><strong>${m.fecha}</strong> (${m.kilometraje}km)<br>${m.trabajos_realizados}</p>`; ul.appendChild(li); });
         resultadoBusqueda.classList.remove('hidden');
     } catch (error) { alert('Error buscar'); }
 }
 
-// --- CITAS, CLIENTES, ETC ---
+async function handleDescargarFichaCliente() {
+    if (!clienteSeleccionadoId) return alert('Selecciona cliente');
+    const url = `${API_URL}/reports/cliente/${clienteSeleccionadoId}?token=${tokenGuardado}`;
+    window.open(url, '_blank');
+}
+
 async function cargarDashboardCitas() {
     try {
         const res = await fetch(`${API_URL}/citas`, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
@@ -270,7 +306,6 @@ async function cargarDashboardCitas() {
         renderCitas(citas.filter(c => c.estado === 'Terminada' && c.fecha_cita.startsWith(hoy)), listaCitasTerminadasUL, 'Terminada');
     } catch (e) { console.error(e); }
 }
-
 function renderCitas(citas, lista, tipo) {
     lista.innerHTML = citas.length ? '' : '<li>Sin citas.</li>';
     citas.forEach(c => {
@@ -283,7 +318,6 @@ function renderCitas(citas, lista, tipo) {
         lista.appendChild(li);
     });
 }
-
 window.gestionarCita = async (id, estado, clientId, vehId, cliName, pat, serv) => {
     if(!confirm(`¿${estado}?`)) return;
     await fetch(`${API_URL}/citas/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${tokenGuardado}` }, body: JSON.stringify({ estado }) });
@@ -300,21 +334,16 @@ window.gestionarCita = async (id, estado, clientId, vehId, cliName, pat, serv) =
         }, 500);
     }
 };
-
 async function cargarListaClientes() {
-    try {
-        const res = await fetch(`${API_URL}/clientes`, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
-        const clientes = await res.json();
-        listaClientesUL.innerHTML = clientes.length ? '' : '<li>Sin clientes.</li>';
-        clientes.forEach(c => {
-            const li = document.createElement('li'); li.className = 'list-item';
-            li.innerHTML = `<span class="list-item-label" onclick="window.seleccionarCliente(${c.id})">${c.nombre}</span>
-                            <div><button class="btn-edit" onclick='window.openClienteModal(${JSON.stringify(c)})'>Edit</button><button class="btn-delete" onclick="window.deleteCliente(${c.id})">X</button></div>`;
-            listaClientesUL.appendChild(li);
-        });
-    } catch (e) { console.error(e); }
+    const res = await fetch(`${API_URL}/clientes`, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
+    const clientes = await res.json();
+    listaClientesUL.innerHTML = clientes.length ? '' : '<li>Sin clientes.</li>';
+    clientes.forEach(c => {
+        const li = document.createElement('li'); li.className = 'list-item';
+        li.innerHTML = `<span class="list-item-label" onclick="window.seleccionarCliente(${c.id})">${c.nombre}</span><div><button class="btn-edit" onclick='window.openClienteModal(${JSON.stringify(c)})'>Edit</button><button class="btn-delete" onclick="window.deleteCliente(${c.id})">X</button></div>`;
+        listaClientesUL.appendChild(li);
+    });
 }
-
 window.seleccionarCliente = async (id) => {
     clienteSeleccionadoId = id;
     colDetalles.classList.remove('hidden');
@@ -324,26 +353,22 @@ window.seleccionarCliente = async (id) => {
     detalleInfo.textContent = `${c.email} | ${c.telefono}`;
     cargarVehiculosCliente(id);
 };
-
 async function handleCrearCliente(e) {
     e.preventDefault();
     const datos = { nombre: document.getElementById('admin-nombre').value, email: document.getElementById('admin-email').value, password: document.getElementById('admin-password').value, telefono: document.getElementById('admin-telefono').value, role: document.getElementById('admin-role').value };
     await fetch(`${API_URL}/auth/register`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${tokenGuardado}` }, body: JSON.stringify(datos) });
     alert('Cliente creado'); formCrearCliente.reset(); cargarListaClientes();
 }
-
 async function cargarVehiculosCliente(id) {
     const res = await fetch(`${API_URL}/clientes/${id}/vehiculos`, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
     const vehs = await res.json();
     listaVehiculosUL.innerHTML = vehs.length ? '' : '<li>Sin vehículos.</li>';
     vehs.forEach(v => {
         const li = document.createElement('li'); li.className = 'list-item';
-        li.innerHTML = `<span class="list-item-label" onclick="window.seleccionarVehiculo(${v.id}, '${v.patente}')">${v.marca} ${v.modelo} - ${v.patente}</span>
-                        <button class="btn-delete" onclick="window.deleteVehiculo(${v.id})">X</button>`;
+        li.innerHTML = `<span class="list-item-label" onclick="window.seleccionarVehiculo(${v.id}, '${v.patente}')">${v.marca} ${v.modelo} - ${v.patente}</span><button class="btn-delete" onclick="window.deleteVehiculo(${v.id})">X</button>`;
         listaVehiculosUL.appendChild(li);
     });
 }
-
 window.seleccionarVehiculo = async (id, patente) => {
     vehiculoSeleccionadoId = id;
     const res = await fetch(`${API_URL}/vehiculos/${id}/mantenimientos`, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
@@ -355,7 +380,6 @@ window.seleccionarVehiculo = async (id, patente) => {
         listaHistorialUL.appendChild(li);
     });
 };
-
 async function handleAgregarVehiculo(e) {
     e.preventDefault();
     if(!clienteSeleccionadoId) return alert('Selecciona cliente');
@@ -364,7 +388,6 @@ async function handleAgregarVehiculo(e) {
     await fetch(`${API_URL}/vehiculos`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${tokenGuardado}` }, body: JSON.stringify(datos) });
     alert('Vehículo agregado'); formAgregarVehiculo.reset(); poblarSelectModelos(''); cargarVehiculosCliente(clienteSeleccionadoId);
 }
-
 async function handleAgregarMantenimiento(e) {
     e.preventDefault();
     if(!vehiculoSeleccionadoId) return alert('Selecciona vehículo');
@@ -372,7 +395,6 @@ async function handleAgregarMantenimiento(e) {
     await fetch(`${API_URL}/mantenimientos`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${tokenGuardado}` }, body: JSON.stringify(datos) });
     alert('Mantenimiento registrado'); formAgregarMantenimiento.reset(); window.seleccionarVehiculo(vehiculoSeleccionadoId, '');
 }
-
 async function cargarDatosDeVehiculos() {
     const res = await fetch(`${API_URL}/vehiculos-data/marcas`, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
     marcasData = await res.json();
@@ -389,34 +411,26 @@ async function poblarSelectModelos(marca) {
     const mods = await res.json();
     mods.forEach(m => selectModelo.add(new Option(m, m)));
 }
-
 async function cargarEstadisticas() {
-    // Marcas
     renderizarGrafico('chart-marcas-top', `${API_URL}/stats/marcas-top`, 'marca');
-    // Modelos
     renderizarGrafico('chart-modelos-top', `${API_URL}/stats/modelos-top`, 'modelo');
 }
-
-async function renderizarGrafico(containerId, url, labelKey) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    container.innerHTML = '<p>Cargando...</p>';
+async function renderizarGrafico(id, url, key) {
+    const c = document.getElementById(id); c.innerHTML = 'Cargando...';
     try {
         const res = await fetch(url, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
         const data = await res.json();
-        container.innerHTML = data.length ? '' : 'Sin datos.';
+        c.innerHTML = data.length ? '' : 'Sin datos.';
         const max = Math.max(...data.map(i => i.total_mantenciones)) || 1;
-        data.forEach(item => {
-            let label = item[labelKey];
-            if(labelKey === 'modelo') label = `${item.marca} ${item.modelo}`;
+        data.forEach(i => {
+            let label = i[key]; if(key==='modelo') label = `${i.marca} ${i.modelo}`;
             const div = document.createElement('div'); div.className = 'chart-bar';
-            div.innerHTML = `<div class="chart-label" title="${label}">${label}</div><div class="chart-bar-inner" style="width: ${(item.total_mantenciones/max)*100}%">${item.total_mantenciones}</div>`;
-            container.appendChild(div);
+            div.innerHTML = `<div class="chart-label" title="${label}">${label}</div><div class="chart-bar-inner" style="width: ${(i.total_mantenciones/max)*100}%">${i.total_mantenciones}</div>`;
+            c.appendChild(div);
         });
-    } catch(e) { container.innerHTML = 'Error'; }
+    } catch(e) { c.innerHTML = 'Error'; }
 }
 
-// SISTEMA
 async function handleDescargarBackup() { window.location.href = `${API_URL}/backup/download?token=${tokenGuardado}`; }
 async function handleRestaurarBackup(e) { e.preventDefault(); alert('Función simulada'); }
 async function handleDescargarExcel() { window.location.href = `${API_URL}/excel/download/clientes?token=${tokenGuardado}`; }
