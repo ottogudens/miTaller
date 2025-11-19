@@ -32,9 +32,9 @@
 
             <div id="view-citas" class="content-view active">
                 <div class="dashboard-grid">
-                    <div class="card dashboard-card"><h3><span class="status-dot status-pendiente"></span>Pendientes</h3><ul id="lista-citas-pendientes-ul" class="lista-citas"><li>Cargando...</li></ul></div>
-                    <div class="card dashboard-card"><h3><span class="status-dot status-confirmada"></span>Confirmadas</h3><ul id="lista-citas-confirmadas-ul" class="lista-citas"><li>Cargando...</li></ul></div>
-                    <div class="card dashboard-card"><h3><span class="status-dot status-terminada"></span>Terminadas (Hoy)</h3><ul id="lista-citas-terminadas-ul" class="lista-citas"><li>Cargando...</li></ul></div>
+                    <div class="card"><h3><span class="status-dot status-pendiente"></span>Pendientes</h3><ul id="lista-citas-pendientes-ul" class="lista-citas"><li>Cargando...</li></ul></div>
+                    <div class="card"><h3><span class="status-dot status-confirmada"></span>Confirmadas</h3><ul id="lista-citas-confirmadas-ul" class="lista-citas"><li>Cargando...</li></ul></div>
+                    <div class="card"><h3><span class="status-dot status-terminada"></span>Terminadas (Hoy)</h3><ul id="lista-citas-terminadas-ul" class="lista-citas"><li>Cargando...</li></ul></div>
                 </div>
             </div>
 
@@ -50,9 +50,23 @@
                 </div>
                 <div id="resultado-busqueda" class="hidden">
                     <div class="card">
-                        <div style="display: flex; justify-content: space-between;"><h3>Datos</h3><button id="btn-ir-cliente" class="btn-edit" style="width: auto;">Ir a Cliente</button></div>
-                        <p><strong>Patente:</strong> <span id="res-patente"></span> | <strong>Vehículo:</strong> <span id="res-marca-modelo"></span></p>
-                        <p><strong>Dueño:</strong> <span id="res-cliente"></span> (<span id="res-email"></span>)</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3>Ficha del Vehículo</h3>
+                            <button id="btn-ir-cliente" class="btn-edit" style="width: auto; margin: 0;">Gestionar Cliente</button>
+                        </div>
+                        <hr>
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2rem;">
+                            <div>
+                                <p><strong>Patente:</strong> <span id="res-patente"></span></p>
+                                <p><strong>Marca/Modelo:</strong> <span id="res-marca-modelo"></span></p>
+                                <p><strong>Año:</strong> <span id="res-anio"></span></p>
+                            </div>
+                            <div>
+                                <p><strong>Cliente:</strong> <span id="res-cliente"></span></p>
+                                <p><strong>Email:</strong> <span id="res-email"></span></p>
+                                <p><strong>Teléfono:</strong> <span id="res-telefono"></span></p>
+                            </div>
+                        </div>
                     </div>
                     <div class="card"><h3>Historial</h3><ul id="res-lista-historial" class="lista-citas"></ul></div>
                 </div>
@@ -74,8 +88,16 @@
                         </div>
                         <div class="card"><h3>Clientes</h3><ul id="lista-clientes-ul"><li>Cargando...</li></ul></div>
                     </section>
+                    
                     <section class="admin-column hidden" id="columna-detalles">
-                        <div class="card"><h3 id="detalle-cliente-nombre">Cliente</h3><p id="detalle-cliente-info"></p></div>
+                        <div class="card">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h3 id="detalle-cliente-nombre">Cliente</h3>
+                                <button id="btn-pdf-cliente" class="btn-descargar" style="margin: 0; font-size: 0.8rem; padding: 0.4rem;">📄 Ficha PDF</button>
+                            </div>
+                            <p id="detalle-cliente-info"></p>
+                        </div>
+                        
                         <div class="card admin-form"><h3>Vehículo</h3><form id="form-agregar-vehiculo"><label>Patente:</label><input type="text" id="admin-patente" required><label>Marca:</label><select id="admin-marca" required></select><label>Modelo:</label><select id="admin-modelo" required></select><label>Año:</label><input type="number" id="admin-anio"><button type="submit">Agregar</button></form></div>
                         <div class="card"><h3>Lista Vehículos</h3><ul id="lista-vehiculos-ul"></ul></div>
                         <div class="card admin-form"><h3>Mantenimiento</h3><form id="form-agregar-mantenimiento"><label>Fecha:</label><input type="date" id="admin-mantenimiento-fecha" required><label>KM:</label><input type="number" id="admin-mantenimiento-km"><label>Trabajo:</label><textarea id="admin-mantenimiento-trabajos" required></textarea><label>Repuestos:</label><textarea id="admin-mantenimiento-repuestos"></textarea><label>Sugerencia:</label><textarea id="admin-mantenimiento-sugerencia"></textarea><label>Prox KM:</label><input type="number" id="admin-mantenimiento-prox-km"><button type="submit">Registrar</button></form></div>
@@ -86,47 +108,8 @@
 
             <div id="view-config-vehiculos" class="content-view">
                 <div class="admin-container-clientes">
-                    
-                    <section class="admin-column">
-                        <div class="card admin-form">
-                            <h3>1. Agregar Marca</h3>
-                            <form id="form-crear-marca">
-                                <div style="display: flex; gap: 10px;">
-                                    <input type="text" id="nueva-marca-nombre" required placeholder="Ej: Mazda">
-                                    <button type="submit" style="margin-top: 0;">Crear</button>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="card">
-                            <h3>Listado de Marcas</h3>
-                            <p style="font-size: 0.8rem; color: #666;">Selecciona una marca para ver/crear modelos.</p>
-                            <ul id="lista-config-marcas" class="config-list"><li>Cargando...</li></ul>
-                        </div>
-                    </section>
-
-                    <section class="admin-column">
-                        <div class="card">
-                            <h3 id="titulo-modelos-marca">2. Modelos</h3>
-                            <p id="info-modelos-marca" style="color: #777;">&larr; Selecciona una marca a la izquierda primero.</p>
-                            
-                            <div id="panel-modelos" class="hidden">
-                                <div class="admin-form" style="margin-bottom: 1rem; background: #f4f4f4; padding: 1rem; border-radius: 5px;">
-                                    <form id="form-crear-modelo">
-                                        <label>Agregar Modelo a esta marca:</label>
-                                        <div style="display: flex; gap: 10px;">
-                                            <input type="text" id="nuevo-modelo-nombre" required placeholder="Ej: CX-5">
-                                            <button type="submit" style="margin-top: 0; background-color: #007bff;">Añadir</button>
-                                        </div>
-                                    </form>
-                                </div>
-                                <ul id="lista-config-modelos" class="config-list">
-                                    <li>Sin modelos aún.</li>
-                                </ul>
-                            </div>
-
-                        </div>
-                    </section>
-
+                    <section class="admin-column"><div class="card admin-form"><h3>Agregar Marca</h3><form id="form-crear-marca"><label>Nombre Marca:</label><div style="display:flex; gap:10px;"><input type="text" id="nueva-marca-nombre" required><button type="submit" style="margin:0;">Añadir</button></div></form></div><div class="card"><h3>Marcas</h3><ul id="lista-config-marcas" class="config-list"><li>Cargando...</li></ul></div></section>
+                    <section class="admin-column"><div class="card"><h3 id="titulo-modelos-marca">Modelos</h3><div id="panel-modelos" class="hidden"><form id="form-crear-modelo" style="margin-bottom:1rem;"><label>Nuevo Modelo:</label><div style="display:flex; gap:10px;"><input type="text" id="nuevo-modelo-nombre" required><button type="submit" style="margin:0;">Añadir</button></div></form><ul id="lista-config-modelos" class="config-list"></ul></div></div></section>
                 </div>
             </div>
 

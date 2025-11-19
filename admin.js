@@ -4,11 +4,12 @@ let usuarioLogueado = null;
 let clienteSeleccionadoId = null; 
 let vehiculoSeleccionadoId = null; 
 let marcasData = [];
-let marcaSeleccionadaId = null; // Variable clave para crear modelos
+let marcaSeleccionadaId = null;
 
-// Variables DOM
+// DOM
 let colDetalles, listaClientesUL, listaVehiculosUL, listaHistorialUL;
-let detalleNombre, detalleInfo, formCrearCliente, formAgregarVehiculo, logoutButton, formAgregarMantenimiento;
+let detalleNombre, detalleInfo, btnPdfCliente; // <-- RECUPERADO
+let formCrearCliente, formAgregarVehiculo, logoutButton, formAgregarMantenimiento;
 let mantenimientoModal, closeMantenimientoModalBtn, formEditMantenimiento, overlay;
 let clienteModal, closeClienteModalBtn, formEditCliente;
 let vehiculoModal, closeVehiculoModalBtn, formEditVehiculo;
@@ -36,10 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
     listaHistorialUL = document.getElementById('lista-historial-ul');
     detalleNombre = document.getElementById('detalle-cliente-nombre');
     detalleInfo = document.getElementById('detalle-cliente-info');
+    btnPdfCliente = document.getElementById('btn-pdf-cliente'); // <-- ASIGNADO
+    
     formCrearCliente = document.getElementById('form-crear-cliente');
     formAgregarVehiculo = document.getElementById('form-agregar-vehiculo');
-    logoutButton = document.getElementById('logout-button');
     formAgregarMantenimiento = document.getElementById('form-agregar-mantenimiento');
+    logoutButton = document.getElementById('logout-button');
     
     overlay = document.getElementById('modal-overlay');
     clienteModal = document.getElementById('cliente-modal');
@@ -72,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
     resultadoBusqueda = document.getElementById('resultado-busqueda');
     btnIrCliente = document.getElementById('btn-ir-cliente');
 
-    // DOM Configuración
     formCrearMarca = document.getElementById('form-crear-marca');
     listaConfigMarcas = document.getElementById('lista-config-marcas');
     formCrearModelo = document.getElementById('form-crear-modelo');
@@ -89,7 +91,7 @@ function iniciarPanelAdmin() {
             e.preventDefault();
             const viewId = link.dataset.view;
             if (viewId === 'estadisticas') cargarEstadisticas();
-            if (viewId === 'config-vehiculos') cargarConfigMarcas(); // Cargar marcas al entrar
+            if (viewId === 'config-vehiculos') cargarConfigMarcas();
             showView(viewId);
         });
     });
@@ -104,9 +106,9 @@ function iniciarPanelAdmin() {
     logoutButton.addEventListener('click', handleCerrarSesion);
     selectMarca.addEventListener('change', () => poblarSelectModelos(selectMarca.value));
     
-    if(formBuscadorPatente) formBuscadorPatente.addEventListener('submit', handleBuscarPatente);
+    if(btnPdfCliente) btnPdfCliente.addEventListener('click', handleDescargarFichaCliente); // <-- LISTENER ACTIVADO
 
-    // Listeners CRUD Marcas/Modelos
+    if(formBuscadorPatente) formBuscadorPatente.addEventListener('submit', handleBuscarPatente);
     if(formCrearMarca) formCrearMarca.addEventListener('submit', handleCrearMarca);
     if(formCrearModelo) formCrearModelo.addEventListener('submit', handleCrearModelo);
 
@@ -129,33 +131,30 @@ function showView(viewId) {
     contentViews.forEach(v => v.classList.remove('active'));
     sidebarLinks.forEach(l => l.classList.remove('active'));
     const viewToShow = document.getElementById(`view-${viewId}`);
-    if(viewToShow) viewToShow.classList.add('active');
     const link = document.querySelector(`.sidebar-nav a[data-view="${viewId}"]`);
+    if(viewToShow) viewToShow.classList.add('active');
     if(link) link.classList.add('active');
 }
 
-// --- LÓGICA GESTIÓN MARCAS Y MODELOS (CRUD) ---
+// --- PDF ---
+async function handleDescargarFichaCliente() {
+    if (!clienteSeleccionadoId) return alert('Selecciona un cliente primero.');
+    const url = `${API_URL}/reports/cliente/${clienteSeleccionadoId}?token=${tokenGuardado}`;
+    window.open(url, '_blank');
+}
 
+// --- CRUD MARCAS ---
 async function cargarConfigMarcas() {
     try {
         const res = await fetch(`${API_URL}/vehiculos-data/marcas`, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
         const marcas = await res.json();
         listaConfigMarcas.innerHTML = '';
-        
         marcas.forEach(m => {
             const li = document.createElement('li');
             const nombre = m.nombre || m;
             const id = m.id || null;
-            
             li.innerHTML = `<span>${nombre}</span> <button class="btn-delete" type="button">X</button>`;
-            
-            // Botón borrar
-            li.querySelector('button').onclick = (e) => { 
-                e.stopPropagation(); 
-                window.borrarMarca(id); 
-            };
-            
-            // Click en la fila para seleccionar
+            li.querySelector('button').onclick = (e) => { e.stopPropagation(); window.borrarMarca(id); };
             li.onclick = () => {
                 seleccionarMarcaConfig(id, nombre);
                 document.querySelectorAll('#lista-config-marcas li').forEach(l => l.classList.remove('selected'));
@@ -170,28 +169,23 @@ async function handleCrearMarca(e) {
     e.preventDefault();
     const nombre = document.getElementById('nueva-marca-nombre').value.trim();
     if(!nombre) return;
-    
     await fetch(`${API_URL}/vehiculos-data/marcas`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${tokenGuardado}` },
         body: JSON.stringify({ nombre })
     });
     document.getElementById('nueva-marca-nombre').value = '';
-    cargarConfigMarcas(); 
-    cargarDatosDeVehiculos(); // Actualiza también los selects de la otra vista
+    cargarConfigMarcas(); cargarDatosDeVehiculos();
 }
 
 window.borrarMarca = async (id) => {
-    if(!confirm('¿Estás seguro? Se borrará la marca y TODOS sus modelos.')) return;
+    if(!confirm('¿Borrar marca y TODOS sus modelos?')) return;
     await fetch(`${API_URL}/vehiculos-data/marcas/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${tokenGuardado}` } });
-    cargarConfigMarcas(); 
-    panelModelos.classList.add('hidden'); 
-    cargarDatosDeVehiculos();
+    cargarConfigMarcas(); panelModelos.classList.add('hidden'); cargarDatosDeVehiculos();
 };
 
-// Al seleccionar una marca, guardamos su ID y mostramos el panel derecho
 async function seleccionarMarcaConfig(id, nombre) {
     marcaSeleccionadaId = id;
-    tituloModelosMarca.textContent = `Modelos de: ${nombre}`;
+    tituloModelosMarca.textContent = `Modelos: ${nombre}`;
     document.getElementById('info-modelos-marca').style.display = 'none';
     panelModelos.classList.remove('hidden');
     cargarConfigModelos(id);
@@ -199,9 +193,9 @@ async function seleccionarMarcaConfig(id, nombre) {
 
 async function cargarConfigModelos(marcaId) {
     const res = await fetch(`${API_URL}/vehiculos-data/modelos-by-id/${marcaId}`, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
+    if(!res.ok) { listaConfigModelos.innerHTML = '<li>Error carga</li>'; return; }
     const modelos = await res.json();
-    listaConfigModelos.innerHTML = modelos.length ? '' : '<li>Sin modelos registrados.</li>';
-    
+    listaConfigModelos.innerHTML = modelos.length ? '' : '<li>Sin modelos.</li>';
     modelos.forEach(m => {
         const li = document.createElement('li');
         li.innerHTML = `<span>${m.nombre}</span> <button class="btn-delete" onclick="window.borrarModelo(${m.id})">X</button>`;
@@ -212,10 +206,7 @@ async function cargarConfigModelos(marcaId) {
 async function handleCrearModelo(e) {
     e.preventDefault();
     const nombre = document.getElementById('nuevo-modelo-nombre').value.trim();
-    
-    // Validación clave: ¿Tenemos marca seleccionada?
-    if(!nombre || !marcaSeleccionadaId) return alert('Error: No se ha seleccionado una marca.');
-    
+    if(!nombre || !marcaSeleccionadaId) return;
     await fetch(`${API_URL}/vehiculos-data/modelos`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${tokenGuardado}` },
         body: JSON.stringify({ nombre, marca_id: marcaSeleccionadaId })
@@ -230,10 +221,7 @@ window.borrarModelo = async (id) => {
     cargarConfigModelos(marcaSeleccionadaId);
 };
 
-// --- FIN LÓGICA CRUD ---
-
-
-// --- RESTO DEL CÓDIGO (Buscador, Citas, Clientes...) ---
+// --- BUSCADOR ---
 async function handleBuscarPatente(e) {
     e.preventDefault();
     const patente = document.getElementById('busqueda-patente').value.trim();
@@ -241,27 +229,40 @@ async function handleBuscarPatente(e) {
     try {
         const res = await fetch(`${API_URL}/vehiculos/buscar/${patente}`, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
         if (!res.ok) { resultadoBusqueda.classList.add('hidden'); return alert('No encontrado'); }
-        const data = await res.json(); const v = data.datos; const h = data.historial || [];
+        const data = await res.json();
+        const v = data.datos; 
+        const h = data.historial || [];
+        
         document.getElementById('res-patente').textContent = v.patente;
         document.getElementById('res-marca-modelo').textContent = `${v.marca} ${v.modelo}`;
         document.getElementById('res-anio').textContent = v.anio || 'N/A';
         document.getElementById('res-cliente').textContent = v.cliente_nombre;
         document.getElementById('res-email').textContent = v.cliente_email;
         document.getElementById('res-telefono').textContent = v.cliente_telefono;
-        btnIrCliente.onclick = () => { showView('clientes'); window.seleccionarCliente(v.cliente_id_real || v.cliente_id); };
-        const ul = document.getElementById('res-lista-historial'); ul.innerHTML = h.length ? '' : '<li>Sin historial.</li>';
+        
+        btnIrCliente.onclick = () => {
+            showView('clientes');
+            window.seleccionarCliente(v.cliente_id_real || v.cliente_id);
+        };
+
+        const ul = document.getElementById('res-lista-historial'); 
+        ul.innerHTML = h.length ? '' : '<li>Sin historial.</li>';
         h.forEach(m => {
             const li = document.createElement('li'); li.className = 'list-item';
-            li.innerHTML = `<p><strong>${m.fecha}</strong> (${m.kilometraje}km)<br>${m.trabajos_realizados}</p>`;
+            li.innerHTML = `<p><strong>${m.fecha}</strong> (${m.kilometraje}km)<br>
+                            Trabajo: ${m.trabajos_realizados}<br>
+                            <em>Repuestos: ${m.repuestos_usados || 'N/A'}</em></p>`;
             ul.appendChild(li);
         });
         resultadoBusqueda.classList.remove('hidden');
     } catch (error) { alert('Error buscar'); }
 }
 
+// --- CITAS, CLIENTES, ETC ---
 async function cargarDashboardCitas() {
     try {
         const res = await fetch(`${API_URL}/citas`, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
+        if (!res.ok) throw new Error('Error citas');
         const citas = await res.json();
         const hoy = new Date().toISOString().slice(0, 10);
         renderCitas(citas.filter(c => c.estado === 'Pendiente'), listaCitasPendientesUL, 'Pendiente');
@@ -269,6 +270,7 @@ async function cargarDashboardCitas() {
         renderCitas(citas.filter(c => c.estado === 'Terminada' && c.fecha_cita.startsWith(hoy)), listaCitasTerminadasUL, 'Terminada');
     } catch (e) { console.error(e); }
 }
+
 function renderCitas(citas, lista, tipo) {
     lista.innerHTML = citas.length ? '' : '<li>Sin citas.</li>';
     citas.forEach(c => {
@@ -281,6 +283,7 @@ function renderCitas(citas, lista, tipo) {
         lista.appendChild(li);
     });
 }
+
 window.gestionarCita = async (id, estado, clientId, vehId, cliName, pat, serv) => {
     if(!confirm(`¿${estado}?`)) return;
     await fetch(`${API_URL}/citas/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${tokenGuardado}` }, body: JSON.stringify({ estado }) });
@@ -294,7 +297,6 @@ window.gestionarCita = async (id, estado, clientId, vehId, cliName, pat, serv) =
              document.getElementById('admin-mantenimiento-trabajos').value = serv;
              formAgregarMantenimiento.scrollIntoView({ behavior: 'smooth' });
              formAgregarMantenimiento.style.border = "2px solid red";
-             setTimeout(() => formAgregarMantenimiento.style.border = "none", 3000);
         }, 500);
     }
 };
@@ -312,6 +314,7 @@ async function cargarListaClientes() {
         });
     } catch (e) { console.error(e); }
 }
+
 window.seleccionarCliente = async (id) => {
     clienteSeleccionadoId = id;
     colDetalles.classList.remove('hidden');
@@ -321,6 +324,7 @@ window.seleccionarCliente = async (id) => {
     detalleInfo.textContent = `${c.email} | ${c.telefono}`;
     cargarVehiculosCliente(id);
 };
+
 async function handleCrearCliente(e) {
     e.preventDefault();
     const datos = { nombre: document.getElementById('admin-nombre').value, email: document.getElementById('admin-email').value, password: document.getElementById('admin-password').value, telefono: document.getElementById('admin-telefono').value, role: document.getElementById('admin-role').value };
@@ -339,6 +343,7 @@ async function cargarVehiculosCliente(id) {
         listaVehiculosUL.appendChild(li);
     });
 }
+
 window.seleccionarVehiculo = async (id, patente) => {
     vehiculoSeleccionadoId = id;
     const res = await fetch(`${API_URL}/vehiculos/${id}/mantenimientos`, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
@@ -350,6 +355,7 @@ window.seleccionarVehiculo = async (id, patente) => {
         listaHistorialUL.appendChild(li);
     });
 };
+
 async function handleAgregarVehiculo(e) {
     e.preventDefault();
     if(!clienteSeleccionadoId) return alert('Selecciona cliente');
@@ -383,30 +389,34 @@ async function poblarSelectModelos(marca) {
     const mods = await res.json();
     mods.forEach(m => selectModelo.add(new Option(m, m)));
 }
+
 async function cargarEstadisticas() {
-    const chartMarcas = document.getElementById('chart-marcas-top');
-    const chartModelos = document.getElementById('chart-modelos-top');
-    if(chartMarcas) renderizarGrafico('chart-marcas-top', `${API_URL}/stats/marcas-top`, 'marca');
-    if(chartModelos) renderizarGrafico('chart-modelos-top', `${API_URL}/stats/modelos-top`, 'modelo');
+    // Marcas
+    renderizarGrafico('chart-marcas-top', `${API_URL}/stats/marcas-top`, 'marca');
+    // Modelos
+    renderizarGrafico('chart-modelos-top', `${API_URL}/stats/modelos-top`, 'modelo');
 }
-async function renderizarGrafico(id, url, key) {
-    const c = document.getElementById(id);
-    c.innerHTML = 'Cargando...';
+
+async function renderizarGrafico(containerId, url, labelKey) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '<p>Cargando...</p>';
     try {
         const res = await fetch(url, { headers: { 'Authorization': `Bearer ${tokenGuardado}` }, cache: 'no-store' });
         const data = await res.json();
-        c.innerHTML = data.length ? '' : 'Sin datos.';
+        container.innerHTML = data.length ? '' : 'Sin datos.';
         const max = Math.max(...data.map(i => i.total_mantenciones)) || 1;
-        data.forEach(i => {
-            let label = i[key];
-            if(key==='modelo') label = `${i.marca} ${i.modelo}`;
+        data.forEach(item => {
+            let label = item[labelKey];
+            if(labelKey === 'modelo') label = `${item.marca} ${item.modelo}`;
             const div = document.createElement('div'); div.className = 'chart-bar';
-            div.innerHTML = `<div class="chart-label" title="${label}">${label}</div><div class="chart-bar-inner" style="width: ${(i.total_mantenciones/max)*100}%">${i.total_mantenciones}</div>`;
-            c.appendChild(div);
+            div.innerHTML = `<div class="chart-label" title="${label}">${label}</div><div class="chart-bar-inner" style="width: ${(item.total_mantenciones/max)*100}%">${item.total_mantenciones}</div>`;
+            container.appendChild(div);
         });
-    } catch(e) { c.innerHTML = 'Error'; }
+    } catch(e) { container.innerHTML = 'Error'; }
 }
 
+// SISTEMA
 async function handleDescargarBackup() { window.location.href = `${API_URL}/backup/download?token=${tokenGuardado}`; }
 async function handleRestaurarBackup(e) { e.preventDefault(); alert('Función simulada'); }
 async function handleDescargarExcel() { window.location.href = `${API_URL}/excel/download/clientes?token=${tokenGuardado}`; }
