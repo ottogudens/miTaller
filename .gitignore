@@ -1,0 +1,15 @@
+# Ignorar carpetas de librerías (se reinstalan con npm install)
+node_modules/
+
+# Ignorar archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar logs de errores
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Opcional: Ignorar la base de datos local si no quieres subir datos reales
+*.db
+*.sqlite
