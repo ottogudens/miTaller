@@ -4,19 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GUDEX - Mi Perfil</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="admin.css"> 
 </head>
 <body>
     
     <header class="admin-header">
         <img src="logorojo.png" alt="GUDEX" class="logo-admin">
-        
-        <p id="bienvenida-usuario" style="color: #2c3e50; font-weight: 600; margin: 0;">Bienvenido</p>
-        
+        <p id="bienvenida-usuario" style="color: var(--secondary); font-weight: 600; margin: 0;">Bienvenido</p>
         <button id="logout-button" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
     </header>
 
@@ -26,17 +22,23 @@
             <ul class="sidebar-nav">
                 <li>
                     <a href="#" class="nav-link active" data-view="dashboard">
-                        <i class="fa-solid fa-gauge-high"></i> Mi Dashboard
+                        <div class="nav-content">
+                            <i class="fa-solid fa-gauge-high"></i> <span>Mi Dashboard</span>
+                        </div>
                     </a>
                 </li>
                 <li>
                     <a href="#" class="nav-link" data-view="vehiculos">
-                        <i class="fa-solid fa-car"></i> Mis Vehículos
+                        <div class="nav-content">
+                            <i class="fa-solid fa-car"></i> <span>Mis Vehículos</span>
+                        </div>
                     </a>
                 </li>
                 <li>
                     <a href="#" class="nav-link" data-view="agendar">
-                        <i class="fa-solid fa-calendar-plus"></i> Agendar Cita
+                        <div class="nav-content">
+                            <i class="fa-solid fa-calendar-plus"></i> <span>Agendar Cita</span>
+                        </div>
                     </a>
                 </li>
             </ul>
@@ -56,7 +58,7 @@
                     <section class="card sugerencia-card">
                         <h2 style="color: #d35400;"><i class="fa-solid fa-bell"></i> Recordatorio</h2>
                         <div class="sugerencia-contenido" style="flex-direction: column; align-items: flex-start; gap: 1rem;">
-                            <p id="proxima-sugerencia-texto" style="font-size: 1.1rem;">Selecciona un vehículo para ver alertas.</p>
+                            <p id="proxima-sugerencia-texto" style="font-size: 1rem;">Selecciona un vehículo para ver alertas.</p>
                             <button id="btn-agendar-sugerencia" class="btn-agendar-sugerencia" style="display:none;">
                                 <i class="fa-solid fa-calendar-check"></i> Agendar Ahora
                             </button>
@@ -66,7 +68,7 @@
             </div>
 
             <div id="view-vehiculos" class="content-view">
-                <div class="dashboard-grid">
+                <div class="dashboard-grid-cliente">
                     <section class="card">
                         <h2><i class="fa-solid fa-car-side"></i> Seleccionar Vehículo</h2>
                         <select id="selector-vehiculo" class="selector-vehiculo">

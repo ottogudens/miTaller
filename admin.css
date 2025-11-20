@@ -1,5 +1,5 @@
 /* ============================================= */
-/* 1. VARIABLES Y RESET (PREMIUM UI)             */
+/* 1. VARIABLES Y RESET (DISEÑO UI)              */
 /* ============================================= */
 :root {
     --primary: #CC0000;      /* Rojo GUDEX */
@@ -46,7 +46,6 @@ body {
 
 .logo-admin { height: 40px; width: auto; }
 .admin-header h2 { font-size: 1.2rem; font-weight: 600; color: var(--secondary); margin: 0; }
-.admin-header p { font-weight: 600; color: var(--primary); margin: 0; }
 
 .btn-logout {
     background: transparent;
@@ -215,10 +214,61 @@ ul { list-style: none; padding: 0; margin: 0; }
 .list-item-label { cursor: pointer; font-weight: 500; flex-grow: 1; display: flex; align-items: center; gap: 10px; }
 .list-item-label:hover { color: var(--primary); }
 
-.config-list { max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); }
-.config-list li { padding: 0.8rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; cursor: pointer; }
+/* --- CONFIG LIST (MARCAS Y MODELOS - CORREGIDO) --- */
+.config-list {
+    max-height: 350px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background-color: #fff;
+}
+
+.config-list li {
+    display: flex;
+    justify-content: space-between; /* Texto a izq, Botón a der */
+    align-items: center;            /* Centrado vertical */
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.2s ease;
+    min-height: 40px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.config-list li:last-child { border-bottom: none; }
 .config-list li:hover { background-color: #f8f9fa; }
-.config-list li.selected { background-color: #e3f2fd; border-left: 4px solid var(--info); }
+
+.config-list li.selected {
+    background-color: #e3f2fd;
+    border-left: 4px solid var(--info);
+    padding-left: calc(1rem - 4px);
+}
+
+/* Texto de la marca/modelo */
+.config-list li span {
+    flex-grow: 1;
+    font-weight: 500;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px;
+}
+
+/* Botón de eliminar alineado */
+.config-list .btn-delete {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+}
+/* -------------------------------------------------- */
 
 /* Status */
 .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
@@ -251,10 +301,11 @@ ul { list-style: none; padding: 0; margin: 0; }
 /* Responsividad */
 @media (max-width: 992px) {
     .admin-layout, .page-layout { display: block; }
-    .sidebar { position: static; width: 100%; height: auto; padding: 0; }
+    .sidebar { position: static; width: 100%; height: auto; display: flex; overflow-x: auto; padding: 10px; background: var(--secondary); }
+    .sidebar-nav { display: flex; gap: 10px; }
+    .sidebar-nav a { white-space: nowrap; padding: 0.6rem 1rem; font-size: 0.9rem; }
     .main-content { margin-left: 0; padding: 1rem; }
     .admin-container-clientes, .dashboard-grid, .stats-grid { display: block; }
-    footer { margin-left: 0; }
 }
 @media (max-width: 768px) {
     .admin-header { position: static; flex-direction: column; height: auto; padding: 1rem; gap: 0.5rem; }
