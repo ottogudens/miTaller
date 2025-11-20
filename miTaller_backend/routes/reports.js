@@ -2,20 +2,19 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../database.js');
 const PDFDocument = require('pdfkit-table');
+const path = require('path');
+const fs = require('fs');
 
 router.get('/cliente/:id', async (req, res) => {
     const clienteId = req.params.id;
 
     try {
-        // 1. Obtener Datos del Cliente
+        // 1. Obtener Datos
         const cliente = await db('clientes').where({ id: clienteId }).first();
         if (!cliente) return res.status(404).send('Cliente no encontrado');
 
-        // 2. Obtener Vehículos
         const vehiculos = await db('vehiculos').where({ cliente_id: clienteId });
         
-        // 3. Obtener Historial Completo (Join para saber qué auto fue)
-        // Buscamos mantenimientos donde el vehiculo_id pertenezca a este cliente
         const vehiculoIds = vehiculos.map(v => v.id);
         let mantenimientos = [];
         
@@ -33,30 +32,40 @@ router.get('/cliente/:id', async (req, res) => {
                 .orderBy('mantenimientos.fecha', 'desc');
         }
 
-        // 4. Iniciar PDF
-        const doc = new PDFDocument({ margin: 30, size: 'A4' });
+        // 2. Configurar PDF
+        const doc = new PDFDocument({ margin: 40, size: 'A4' });
 
-        // Headers para forzar descarga
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `attachment; filename=Ficha_${cliente.nombre.replace(/\s+/g, '_')}.pdf`);
 
         doc.pipe(res);
 
-        // --- TÍTULO ---
-        doc.fontSize(20).text('GUDEX - Ficha Técnica de Cliente', { align: 'center' });
-        doc.moveDown();
+        // --- LOGO Y ENCABEZADO ---
+        // Ruta a la imagen en la carpeta raíz del backend
+        const logoPath = path.join(__dirname, '../logorojo.png');
+
+        // Verificar si existe el logo antes de intentar ponerlo para evitar errores
+        if (fs.existsSync(logoPath)) {
+            // (ruta, x, y, opciones)
+            doc.image(logoPath, 40, 30, { width: 80 }); 
+        }
+
+        // Título alineado
+        doc.fontSize(20).font('Helvetica-Bold').text('GUDEX - Ficha Técnica', { align: 'center' });
+        doc.fontSize(10).font('Helvetica').text('Reporte de Cliente y Servicios', { align: 'center' });
+        doc.moveDown(3); // Espacio después del encabezado
 
         // --- DATOS CLIENTE ---
-        doc.fontSize(14).text('Datos Personales', { underline: true });
+        doc.fontSize(14).font('Helvetica-Bold').text('Datos Personales', { underline: true });
         doc.moveDown(0.5);
-        doc.fontSize(10);
+        doc.fontSize(10).font('Helvetica');
         doc.text(`Nombre: ${cliente.nombre}`);
         doc.text(`Email: ${cliente.email}`);
         doc.text(`Teléfono: ${cliente.telefono || 'No registrado'}`);
         doc.moveDown(2);
 
         // --- TABLA VEHÍCULOS ---
-        doc.fontSize(14).text('Vehículos Registrados', { underline: true });
+        doc.fontSize(14).font('Helvetica-Bold').text('Vehículos Registrados', { underline: true });
         doc.moveDown(0.5);
 
         if (vehiculos.length > 0) {
@@ -70,12 +79,12 @@ router.get('/cliente/:id', async (req, res) => {
                 prepareRow: () => doc.font('Helvetica').fontSize(10)
             });
         } else {
-            doc.fontSize(10).text('No hay vehículos registrados.');
+            doc.fontSize(10).font('Helvetica').text('No tiene vehículos registrados.');
         }
         doc.moveDown(2);
 
         // --- TABLA HISTORIAL ---
-        doc.fontSize(14).text('Historial de Servicios', { underline: true });
+        doc.fontSize(14).font('Helvetica-Bold').text('Historial de Servicios', { underline: true });
         doc.moveDown(0.5);
 
         if (mantenimientos.length > 0) {
@@ -94,13 +103,17 @@ router.get('/cliente/:id', async (req, res) => {
                 prepareRow: () => doc.font('Helvetica').fontSize(10)
             });
         } else {
-            doc.fontSize(10).text('No hay registros de mantenimiento.');
+            doc.fontSize(10).font('Helvetica').text('No hay registros de mantenimiento.');
         }
+
+        // Pie de página
+        doc.moveDown(2);
+        doc.fontSize(8).fillColor('grey').text('Generado automáticamente por Sistema GUDEX', { align: 'center' });
 
         doc.end();
 
     } catch (error) {
-        console.error(error);
+        console.error('Error PDF:', error);
         res.status(500).send('Error generando PDF');
     }
 });

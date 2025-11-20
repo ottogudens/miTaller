@@ -3,26 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GUDEX Serviteca - Ficha Cliente</title>
-    <link rel="stylesheet" href="style.css">
+    <title>GUDEX - Mi Perfil</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="admin.css"> 
 </head>
 <body>
     
-    <header class="admin-header"> <img src="logo.png" alt="Logo GUDEX Serviteca" class="logo-admin">
-        <p id="bienvenida-usuario">Bienvenido...</p>
-        <button id="logout-button" class="btn-logout">Cerrar Sesión</button>
+    <header class="admin-header">
+        <img src="logorojo.png" alt="GUDEX" class="logo-admin">
+        
+        <p id="bienvenida-usuario" style="color: #2c3e50; font-weight: 600; margin: 0;">Bienvenido</p>
+        
+        <button id="logout-button" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
     </header>
 
-    <div class="page-layout"> <nav class="sidebar">
+    <div class="page-layout">
+        
+        <nav class="sidebar">
             <ul class="sidebar-nav">
                 <li>
-                    <a href="#" class="nav-link active" data-view="dashboard">Mi Dashboard</a>
+                    <a href="#" class="nav-link active" data-view="dashboard">
+                        <i class="fa-solid fa-gauge-high"></i> Mi Dashboard
+                    </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link" data-view="vehiculos">Mis Vehículos</a>
+                    <a href="#" class="nav-link" data-view="vehiculos">
+                        <i class="fa-solid fa-car"></i> Mis Vehículos
+                    </a>
                 </li>
                 <li>
-                    <a href="#" class="nav-link" data-view="agendar">Agendar Cita</a>
+                    <a href="#" class="nav-link" data-view="agendar">
+                        <i class="fa-solid fa-calendar-plus"></i> Agendar Cita
+                    </a>
                 </li>
             </ul>
         </nav>
@@ -31,91 +46,90 @@
 
             <div id="view-dashboard" class="content-view active">
                 <div class="dashboard-grid-cliente">
-                    
-                    <section class="card mis-citas">
-                        <h2>Estado de mis Citas</h2>
+                    <section class="card">
+                        <h2><i class="fa-solid fa-list-check"></i> Mis Citas</h2>
                         <ul id="lista-estado-citas">
-                            <li>Cargando citas...</li>
+                            <li><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</li>
                         </ul>
                     </section>
                     
                     <section class="card sugerencia-card">
-                        <h2>Próxima Mantención Sugerida</h2>
-                        <div class="sugerencia-contenido">
-                            <p id="proxima-sugerencia-texto">Selecciona un vehículo para ver sugerencias.</p>
-                            <button id="btn-agendar-sugerencia" class="btn-agendar-sugerencia" style="display: none;">
-                                Agendar Servicio
+                        <h2 style="color: #d35400;"><i class="fa-solid fa-bell"></i> Recordatorio</h2>
+                        <div class="sugerencia-contenido" style="flex-direction: column; align-items: flex-start; gap: 1rem;">
+                            <p id="proxima-sugerencia-texto" style="font-size: 1.1rem;">Selecciona un vehículo para ver alertas.</p>
+                            <button id="btn-agendar-sugerencia" class="btn-agendar-sugerencia" style="display:none;">
+                                <i class="fa-solid fa-calendar-check"></i> Agendar Ahora
                             </button>
                         </div>
                     </section>
-
                 </div>
             </div>
 
             <div id="view-vehiculos" class="content-view">
-                <section class="card vehiculo-info">
-                    <h2>Tus Vehículos</h2>
-                    <label for="selector-vehiculo" style="font-weight: bold;">Selecciona un vehículo:</label>
-                    <select id="selector-vehiculo" name="selector-vehiculo" class="selector-vehiculo">
-                        <option value="">Cargando vehículos...</option>
-                    </select>
-                    <h3 id="vehiculo-nombre" style="margin-top: 1rem;"></h3>
-                    <ul id="vehiculo-detalles"></ul>
-                </section>
+                <div class="dashboard-grid">
+                    <section class="card">
+                        <h2><i class="fa-solid fa-car-side"></i> Seleccionar Vehículo</h2>
+                        <select id="selector-vehiculo" class="selector-vehiculo">
+                            <option>Cargando...</option>
+                        </select>
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                            <h3 id="vehiculo-nombre" style="margin:0; color: var(--secondary);"></h3>
+                            <ul id="vehiculo-detalles" style="margin-top: 0.5rem; color: var(--text-light);"></ul>
+                        </div>
+                    </section>
 
-                <section class="card historial">
-                    <h2>Historial de Mantenciones</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Trabajos Realizados</th>
-                                <th>Repuestos Utilizados</th>
-                                <th>Kilometraje</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historial-tbody">
-                            <tr>
-                                <td colspan="4" style="text-align: center;">Selecciona un vehículo...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </section>
+                    <section class="card">
+                        <h2><i class="fa-solid fa-clock-rotate-left"></i> Historial de Servicios</h2>
+                        <div class="historial">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Trabajo</th>
+                                        <th>Repuestos</th>
+                                        <th>KM</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historial-tbody">
+                                    <tr><td colspan="4">Sin datos</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
             </div>
 
             <div id="view-agendar" class="content-view">
-                <section class="card agendar">
-                    <h2>Agendar Próxima Cita</h2>
-                    <p>¿Necesitas una nueva mantención o revisión?</p>
-                    <form id="form-agendar">
-                        <label for="fecha-cita-dia">Selecciona una fecha:</label>
-                        <input type="date" id="fecha-cita-dia" name="fecha-cita-dia" required>
-                        <label for="fecha-cita-hora">Selecciona una hora (L-V 09-18hrs):</label>
-                        <select id="fecha-cita-hora" name="fecha-cita-hora" required>
-                            <option value="">-- Elige una hora --</option>
-                            <option value="09:00">09:00</option>
-                            <option value="10:00">10:00</option>
-                            <option value="11:00">11:00</option>
-                            <option value="12:00">12:00</option>
-                            <option value="13:00">13:00</option>
-                            <option value="14:00">14:00</option>
-                            <option value="15:00">15:00</option>
-                            <option value="16:00">16:00</option>
-                            <option value="17:00">17:00</option>
-                        </select>
-                        <label for="servicio-cita">Motivo de la visita:</label>
-                        <input type="text" id="servicio-cita" name="servicio-cita" placeholder="Ej: Mantención 50.000km" required>
-                        <button type="submit">Solicitar Hora</button>
-                    </form>
-                </section>
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <section class="card agendar">
+                        <h2><i class="fa-solid fa-calendar-days"></i> Solicitar Nueva Hora</h2>
+                        <form id="form-agendar">
+                            <label>Selecciona Fecha:</label>
+                            <input type="date" id="fecha-cita-dia" required>
+                            
+                            <label>Selecciona Hora (09:00 - 18:00):</label>
+                            <select id="fecha-cita-hora" required>
+                                <option value="">-- Elige un bloque --</option>
+                                <option value="09:00">09:00 AM</option><option value="10:00">10:00 AM</option>
+                                <option value="11:00">11:00 AM</option><option value="12:00">12:00 PM</option>
+                                <option value="13:00">01:00 PM</option><option value="14:00">02:00 PM</option>
+                                <option value="15:00">03:00 PM</option><option value="16:00">04:00 PM</option>
+                                <option value="17:00">05:00 PM</option>
+                            </select>
+                            
+                            <label>Motivo de la visita:</label>
+                            <input type="text" id="servicio-cita" placeholder="Ej: Cambio de aceite, Revisión frenos..." required>
+                            
+                            <button type="submit" class="btn-confirmar" style="margin-top: 1.5rem;">
+                                <i class="fa-solid fa-paper-plane"></i> Enviar Solicitud
+                            </button>
+                        </form>
+                    </section>
+                </div>
             </div>
 
         </main>
     </div>
-
-    <footer>
-        <p>&copy; 2025 GUDEX Serviteca - Todos los derechos reservados.</p>
-    </footer>
 
     <script src="app.js"></script>
 </body>

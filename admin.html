@@ -4,27 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GUDEX - Panel de Administración</title>
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
     
     <header class="admin-header">
-        <img src="logo.png" alt="Logo GUDEX" class="logo-admin">
+        <img src="logorojo.png" alt="Logo GUDEX" class="logo-admin">
         <h2>Panel de Administración</h2>
-        <button id="logout-button" class="btn-logout">Cerrar Sesión</button>
+        <button id="logout-button" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</button>
     </header>
 
     <div class="admin-layout">
         
         <nav class="sidebar">
             <ul class="sidebar-nav">
-                <li><a href="#" class="nav-link active" data-view="citas">Dashboard Citas</a></li>
-                <li><a href="#" class="nav-link" data-view="buscador">Buscador Patente</a></li>
-                <li><a href="#" class="nav-link" data-view="clientes">Gestión Clientes</a></li>
-                <li><a href="#" class="nav-link" data-view="config-vehiculos">Marcas y Modelos</a></li>
-                <li><a href="#" class="nav-link" data-view="estadisticas">Estadísticas</a></li>
-                <li><a href="#" class="nav-link" data-view="sistema">Sistema y Respaldos</a></li>
+                <li>
+                    <a href="#" class="nav-link active" data-view="citas">
+                        <div class="nav-content"><i class="fa-solid fa-calendar-check"></i> <span>Dashboard</span></div>
+                    </a>
+                </li>
+                <li class="nav-group">
+                    <a href="#" class="nav-toggle">
+                        <div class="nav-content"><i class="fa-solid fa-briefcase"></i> <span>Operaciones</span></div>
+                        <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                    </a>
+                    <ul class="sub-menu">
+                        <li><a href="#" class="nav-link" data-view="buscador">Buscador Patente</a></li>
+                        <li><a href="#" class="nav-link" data-view="clientes">Gestión Clientes</a></li>
+                    </ul>
+                </li>
+                <li class="nav-group">
+                    <a href="#" class="nav-toggle">
+                        <div class="nav-content"><i class="fa-solid fa-gears"></i> <span>Administración</span></div>
+                        <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                    </a>
+                    <ul class="sub-menu">
+                        <li><a href="#" class="nav-link" data-view="config-vehiculos">Marcas y Modelos</a></li>
+                        <li><a href="#" class="nav-link" data-view="estadisticas">Estadísticas</a></li>
+                        <li><a href="#" class="nav-link" data-view="sistema">Sistema y Respaldos</a></li>
+                    </ul>
+                </li>
             </ul>
         </nav>
 
@@ -32,115 +53,66 @@
 
             <div id="view-citas" class="content-view active">
                 <div class="dashboard-grid">
-                    <div class="card"><h3><span class="status-dot status-pendiente"></span>Pendientes</h3><ul id="lista-citas-pendientes-ul" class="lista-citas"><li>Cargando...</li></ul></div>
-                    <div class="card"><h3><span class="status-dot status-confirmada"></span>Confirmadas</h3><ul id="lista-citas-confirmadas-ul" class="lista-citas"><li>Cargando...</li></ul></div>
-                    <div class="card"><h3><span class="status-dot status-terminada"></span>Terminadas (Hoy)</h3><ul id="lista-citas-terminadas-ul" class="lista-citas"><li>Cargando...</li></ul></div>
+                    <div class="card"><h3><i class="fa-solid fa-clock status-pendiente"></i> Pendientes</h3><ul id="lista-citas-pendientes-ul" class="lista-citas"><li>Cargando...</li></ul></div>
+                    <div class="card"><h3><i class="fa-solid fa-check-circle status-confirmada"></i> Confirmadas</h3><ul id="lista-citas-confirmadas-ul" class="lista-citas"><li>Cargando...</li></ul></div>
+                    <div class="card"><h3><i class="fa-solid fa-flag-checkered status-terminada"></i> Terminadas (Hoy)</h3><ul id="lista-citas-terminadas-ul" class="lista-citas"><li>Cargando...</li></ul></div>
                 </div>
             </div>
 
             <div id="view-buscador" class="content-view">
                 <div class="card admin-form">
-                    <h3>Buscar Vehículo</h3>
+                    <h3><i class="fa-solid fa-magnifying-glass"></i> Buscar Vehículo</h3>
                     <form id="form-buscador-patente">
                         <div style="display: flex; gap: 10px;">
-                            <input type="text" id="busqueda-patente" placeholder="Ej: ABCD12" required style="text-transform: uppercase;">
-                            <button type="submit" style="margin-top: 0;">Buscar</button>
+                            <input type="text" id="busqueda-patente" placeholder="Ej: ABCD12" required style="text-transform: uppercase; font-weight: bold;">
+                            <button type="submit" style="margin-top: 0;"><i class="fa-solid fa-search"></i> Buscar</button>
                         </div>
                     </form>
                 </div>
                 <div id="resultado-busqueda" class="hidden">
                     <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h3>Ficha del Vehículo</h3>
-                            <button id="btn-ir-cliente" class="btn-edit" style="width: auto; margin: 0;">Gestionar Cliente</button>
-                        </div>
-                        <hr>
-                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 2rem;">
-                            <div>
-                                <p><strong>Patente:</strong> <span id="res-patente"></span></p>
-                                <p><strong>Marca/Modelo:</strong> <span id="res-marca-modelo"></span></p>
-                                <p><strong>Año:</strong> <span id="res-anio"></span></p>
-                            </div>
-                            <div>
-                                <p><strong>Cliente:</strong> <span id="res-cliente"></span></p>
-                                <p><strong>Email:</strong> <span id="res-email"></span></p>
-                                <p><strong>Teléfono:</strong> <span id="res-telefono"></span></p>
-                            </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;"><h3>Ficha</h3><button id="btn-ir-cliente" class="btn-edit" style="width:auto; margin:0;">Gestionar</button></div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div><p><strong>Patente:</strong> <span id="res-patente"></span></p><p><strong>Vehículo:</strong> <span id="res-marca-modelo"></span></p><p><strong>Año:</strong> <span id="res-anio"></span></p></div>
+                            <div><p><strong>Dueño:</strong> <span id="res-cliente"></span></p><p><strong>Email:</strong> <span id="res-email"></span></p><p><strong>Tel:</strong> <span id="res-telefono"></span></p></div>
                         </div>
                     </div>
-                    <div class="card"><h3>Historial de Mantenciones</h3><ul id="res-lista-historial" class="lista-citas"></ul></div>
+                    <div class="card"><h3>Historial</h3><ul id="res-lista-historial" class="lista-citas"></ul></div>
                 </div>
             </div>
 
             <div id="view-clientes" class="content-view">
                 <div class="admin-container-clientes">
                     <section class="admin-column">
-                        <div class="card admin-form">
-                            <h3>Registrar Cliente</h3>
-                            <form id="form-crear-cliente">
-                                <label>Nombre:</label><input type="text" id="admin-nombre" required>
-                                <label>Email:</label><input type="email" id="admin-email" required>
-                                <label>Contraseña:</label><input type="password" id="admin-password" required>
-                                <label>Teléfono:</label><input type="tel" id="admin-telefono">
-                                <label>Rol:</label><select id="admin-role"><option value="cliente">Cliente</option><option value="admin">Admin</option></select>
-                                <button type="submit">Crear Cliente</button>
-                            </form>
-                        </div>
-                        <div class="card"><h3>Lista de Clientes</h3><ul id="lista-clientes-ul"><li>Cargando...</li></ul></div>
+                        <div class="card admin-form"><h3><i class="fa-solid fa-user-plus"></i> Registrar Cliente</h3><form id="form-crear-cliente"><label>Nombre:</label><input type="text" id="admin-nombre" required><label>Email:</label><input type="email" id="admin-email" required><label>Pass:</label><input type="password" id="admin-password" required><label>Tel:</label><input type="tel" id="admin-telefono"><label>Rol:</label><select id="admin-role"><option value="cliente">Cliente</option><option value="admin">Admin</option></select><button type="submit">Crear</button></form></div>
+                        <div class="card"><h3><i class="fa-solid fa-list"></i> Clientes</h3><ul id="lista-clientes-ul"><li>Cargando...</li></ul></div>
                     </section>
-                    
                     <section class="admin-column hidden" id="columna-detalles">
-                        <div class="card">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <h3 id="detalle-cliente-nombre">Cliente</h3>
-                                <button id="btn-pdf-cliente" class="btn-descargar" style="margin:0; font-size:0.8rem; padding: 0.4rem;">📄 PDF</button>
-                            </div>
-                            <p id="detalle-cliente-info"></p>
-                        </div>
-                        
-                        <div class="card admin-form"><h3>Agregar Vehículo</h3><form id="form-agregar-vehiculo"><label>Patente:</label><input type="text" id="admin-patente" required><label>Marca:</label><select id="admin-marca" required></select><label>Modelo:</label><select id="admin-modelo" required></select><label>Año:</label><input type="number" id="admin-anio"><button type="submit">Agregar Vehículo</button></form></div>
-                        
-                        <div class="card"><h3>Vehículos</h3><ul id="lista-vehiculos-ul"><li>Selecciona un cliente...</li></ul></div>
-                        
-                        <div class="card admin-form" style="border: 2px solid #007bff; background-color: #f0f8ff;">
-                            <h3 style="color: #007bff; border-bottom-color: #cce5ff;">Agendar Cita</h3>
-                            <p style="font-size: 0.8rem; color: #666; margin-top: -10px;">Para el vehículo seleccionado arriba.</p>
-                            <form id="form-admin-agendar-cita">
-                                <label>Fecha:</label><input type="date" id="admin-cita-fecha" required>
-                                <label>Hora:</label>
-                                <select id="admin-cita-hora" required>
-                                    <option value="">-- Selecciona Hora --</option>
-                                    <option value="09:00">09:00</option><option value="10:00">10:00</option>
-                                    <option value="11:00">11:00</option><option value="12:00">12:00</option>
-                                    <option value="13:00">13:00</option><option value="14:00">14:00</option>
-                                    <option value="15:00">15:00</option><option value="16:00">16:00</option>
-                                    <option value="17:00">17:00</option>
-                                </select>
-                                <label>Servicio Solicitado:</label><input type="text" id="admin-cita-servicio" required placeholder="Ej: Revisión de frenos">
-                                <button type="submit" style="background-color: #007bff;">Agendar Cita</button>
-                            </form>
-                        </div>
-                        <div class="card admin-form"><h3>Registrar Mantenimiento</h3><form id="form-agregar-mantenimiento"><label>Fecha:</label><input type="date" id="admin-mantenimiento-fecha" required><label>KM:</label><input type="number" id="admin-mantenimiento-km"><label>Trabajos:</label><textarea id="admin-mantenimiento-trabajos" rows="3" required></textarea><label>Repuestos:</label><textarea id="admin-mantenimiento-repuestos" rows="2"></textarea><label>Sugerencia:</label><textarea id="admin-mantenimiento-sugerencia" rows="2"></textarea><label>Próximo KM:</label><input type="number" id="admin-mantenimiento-prox-km"><button type="submit">Registrar</button></form></div>
-                        <div class="card"><h3>Historial</h3><ul id="lista-historial-ul"><li>Selecciona un vehículo...</li></ul></div>
+                        <div class="card"><div style="display:flex; justify-content:space-between;"><h3 id="detalle-cliente-nombre"><i class="fa-solid fa-user"></i> Cliente</h3><button id="btn-pdf-cliente" class="btn-descargar" style="margin:0; font-size:0.8rem; padding: 0.4rem;"><i class="fa-solid fa-file-pdf"></i> PDF</button></div><p id="detalle-cliente-info"></p></div>
+                        <div class="card admin-form"><h3><i class="fa-solid fa-car"></i> Vehículo</h3><form id="form-agregar-vehiculo"><label>Patente:</label><input type="text" id="admin-patente" required><label>Marca:</label><select id="admin-marca" required></select><label>Modelo:</label><select id="admin-modelo" required></select><label>Año:</label><input type="number" id="admin-anio"><button type="submit">Agregar</button></form></div>
+                        <div class="card"><h3>Lista Vehículos</h3><ul id="lista-vehiculos-ul"></ul></div>
+                        <div class="card admin-form" style="border: 2px solid var(--info);"><h3 style="color:var(--info);"><i class="fa-solid fa-calendar-plus"></i> Agendar Cita</h3><form id="form-admin-agendar-cita"><label>Fecha:</label><input type="date" id="admin-cita-fecha" required><label>Hora:</label><select id="admin-cita-hora" required><option value="">-- Hora --</option><option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option></select><label>Servicio:</label><input type="text" id="admin-cita-servicio" required><button type="submit" style="background-color:var(--info);">Agendar</button></form></div>
+                        <div class="card admin-form"><h3><i class="fa-solid fa-tools"></i> Mantenimiento</h3><form id="form-agregar-mantenimiento"><label>Fecha:</label><input type="date" id="admin-mantenimiento-fecha" required><label>KM:</label><input type="number" id="admin-mantenimiento-km"><label>Trabajo:</label><textarea id="admin-mantenimiento-trabajos" required></textarea><label>Repuestos:</label><textarea id="admin-mantenimiento-repuestos"></textarea><label>Sugerencia:</label><textarea id="admin-mantenimiento-sugerencia"></textarea><label>Prox KM:</label><input type="number" id="admin-mantenimiento-prox-km"><button type="submit">Registrar</button></form></div>
+                        <div class="card"><h3>Historial</h3><ul id="lista-historial-ul"></ul></div>
                     </section>
                 </div>
             </div>
 
             <div id="view-config-vehiculos" class="content-view">
                 <div class="admin-container-clientes">
-                    <section class="admin-column"><div class="card admin-form"><h3>Agregar Marca</h3><form id="form-crear-marca"><label>Nombre Marca:</label><div style="display: flex; gap: 10px;"><input type="text" id="nueva-marca-nombre" required placeholder="Ej: Ferrari"><button type="submit" style="margin-top: 0;">Añadir</button></div></form></div><div class="card"><h3>Listado de Marcas</h3><ul id="lista-config-marcas" class="config-list"><li>Cargando...</li></ul></div></section>
-                    <section class="admin-column"><div class="card"><h3 id="titulo-modelos-marca">Modelos</h3><p id="info-modelos-marca">Selecciona una marca.</p><div id="panel-modelos" class="hidden"><form id="form-crear-modelo" style="margin-bottom: 1rem;"><label>Nuevo Modelo:</label><div style="display: flex; gap: 10px;"><input type="text" id="nuevo-modelo-nombre" required placeholder="Ej: Enzo"><button type="submit" style="margin-top: 0;">Añadir</button></div></form><ul id="lista-config-modelos" class="config-list"></ul></div></div></section>
+                    <section class="admin-column"><div class="card admin-form"><h3><i class="fa-solid fa-plus"></i> Marca</h3><form id="form-crear-marca"><div style="display:flex; gap:10px;"><input type="text" id="nueva-marca-nombre" required placeholder="Ej: Kia"><button type="submit" style="margin:0;">Crear</button></div></form></div><div class="card"><h3>Marcas</h3><ul id="lista-config-marcas" class="config-list"><li>Cargando...</li></ul></div></section>
+                    <section class="admin-column"><div class="card"><h3 id="titulo-modelos-marca">Modelos</h3><div id="panel-modelos" class="hidden"><div class="admin-form" style="margin-bottom:1rem; padding:1rem; background:#f8f9fa;"><form id="form-crear-modelo"><label>Nuevo Modelo:</label><div style="display:flex; gap:10px;"><input type="text" id="nuevo-modelo-nombre" required placeholder="Ej: Rio"><button type="submit" style="margin:0; background-color: var(--info);">Añadir</button></div></form></div><ul id="lista-config-modelos" class="config-list"></ul></div><p id="info-modelos-marca" style="color:#666;">&larr; Selecciona una marca.</p></div></section>
                 </div>
             </div>
 
             <div id="view-estadisticas" class="content-view">
-                <div class="card"><h2>Estadísticas</h2><div class="stats-grid"><div class="stat-container"><h3>Top 5 Marcas</h3><div id="chart-marcas-top" class="chart-container"></div></div><div class="stat-container"><h3>Top 5 Modelos</h3><div id="chart-modelos-top" class="chart-container"></div></div></div></div>
+                <div class="card"><h2><i class="fa-solid fa-chart-line"></i> Estadísticas</h2><div class="stats-grid"><div class="stat-container"><h3>Top 5 Marcas</h3><div id="chart-marcas-top" class="chart-container"></div></div><div class="stat-container"><h3>Top 5 Modelos</h3><div id="chart-modelos-top" class="chart-container"></div></div></div></div>
             </div>
 
             <div id="view-sistema" class="content-view">
                 <div class="dashboard-grid">
-                    <div class="card admin-form"><h3>Respaldo BD</h3><form id="form-backup-restore"><button type="button" id="btn-descargar-backup" class="btn-descargar">Descargar</button><hr class="form-hr"><label>Restaurar:</label><input type="file" id="backup-file" accept=".db"><button type="submit" id="btn-restaurar-backup" class="btn-delete">Restaurar</button></form></div>
-                    <div class="card admin-form"><h3>Carga Masiva</h3><form id="form-excel-restore"><button type="button" id="btn-descargar-excel" class="btn-excel">Plantilla</button><hr class="form-hr"><label>Subir:</label><input type="file" id="excel-file" accept=".xls,.xlsx"><button type="submit" id="btn-restaurar-excel" class="btn-subir-excel">Procesar</button></form></div>
+                    <div class="card admin-form"><h3><i class="fa-solid fa-server"></i> Respaldo BD</h3><form id="form-backup-restore"><button type="button" id="btn-descargar-backup" class="btn-descargar">Descargar</button><hr class="form-hr"><label>Restaurar:</label><input type="file" id="backup-file" accept=".db"><button type="submit" id="btn-restaurar-backup" class="btn-delete">Restaurar</button></form></div>
+                    <div class="card admin-form"><h3><i class="fa-solid fa-file-excel"></i> Carga Masiva</h3><form id="form-excel-restore"><button type="button" id="btn-descargar-excel" class="btn-excel">Plantilla</button><hr class="form-hr"><label>Subir:</label><input type="file" id="excel-file" accept=".xls,.xlsx"><button type="submit" id="btn-restaurar-excel" class="btn-subir-excel">Procesar</button></form></div>
                 </div>
             </div>
 
