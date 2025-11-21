@@ -12,127 +12,27 @@
     
     <header class="admin-header">
         <img src="logorojo.png" alt="GUDEX" class="logo-admin">
-        <p id="bienvenida-usuario" style="color: var(--secondary); font-weight: 600; margin: 0;">Bienvenido</p>
-        <button id="logout-button" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+        <div class="header-right">
+            <p id="bienvenida-usuario" style="color: #2c3e50; font-weight: 600; margin: 0; margin-right: 10px;">Bienvenido</p>
+            <div id="reloj-sistema" class="reloj-sistema"></div>
+            <button id="logout-button" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+        </div>
     </header>
 
     <div class="page-layout">
-        
         <nav class="sidebar">
             <ul class="sidebar-nav">
-                <li>
-                    <a href="#" class="nav-link active" data-view="dashboard">
-                        <div class="nav-content">
-                            <i class="fa-solid fa-gauge-high"></i> <span>Mi Dashboard</span>
-                        </div>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" data-view="vehiculos">
-                        <div class="nav-content">
-                            <i class="fa-solid fa-car"></i> <span>Mis Vehículos</span>
-                        </div>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="nav-link" data-view="agendar">
-                        <div class="nav-content">
-                            <i class="fa-solid fa-calendar-plus"></i> <span>Agendar Cita</span>
-                        </div>
-                    </a>
-                </li>
+                <li><a href="#" class="nav-link active" data-view="dashboard"><div class="nav-content"><i class="fa-solid fa-gauge-high"></i> <span>Mi Dashboard</span></div></a></li>
+                <li><a href="#" class="nav-link" data-view="vehiculos"><div class="nav-content"><i class="fa-solid fa-car"></i> <span>Mis Vehículos</span></div></a></li>
+                <li><a href="#" class="nav-link" data-view="agendar"><div class="nav-content"><i class="fa-solid fa-calendar-plus"></i> <span>Agendar Cita</span></div></a></li>
             </ul>
         </nav>
-
         <main class="main-content">
-
-            <div id="view-dashboard" class="content-view active">
-                <div class="dashboard-grid-cliente">
-                    <section class="card">
-                        <h2><i class="fa-solid fa-list-check"></i> Mis Citas</h2>
-                        <ul id="lista-estado-citas">
-                            <li><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</li>
-                        </ul>
-                    </section>
-                    
-                    <section class="card sugerencia-card">
-                        <h2 style="color: #d35400;"><i class="fa-solid fa-bell"></i> Recordatorio</h2>
-                        <div class="sugerencia-contenido" style="flex-direction: column; align-items: flex-start; gap: 1rem;">
-                            <p id="proxima-sugerencia-texto" style="font-size: 1rem;">Selecciona un vehículo para ver alertas.</p>
-                            <button id="btn-agendar-sugerencia" class="btn-agendar-sugerencia" style="display:none;">
-                                <i class="fa-solid fa-calendar-check"></i> Agendar Ahora
-                            </button>
-                        </div>
-                    </section>
-                </div>
-            </div>
-
-            <div id="view-vehiculos" class="content-view">
-                <div class="dashboard-grid-cliente">
-                    <section class="card">
-                        <h2><i class="fa-solid fa-car-side"></i> Seleccionar Vehículo</h2>
-                        <select id="selector-vehiculo" class="selector-vehiculo">
-                            <option>Cargando...</option>
-                        </select>
-                        <div style="margin-top: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
-                            <h3 id="vehiculo-nombre" style="margin:0; color: var(--secondary);"></h3>
-                            <ul id="vehiculo-detalles" style="margin-top: 0.5rem; color: var(--text-light);"></ul>
-                        </div>
-                    </section>
-
-                    <section class="card">
-                        <h2><i class="fa-solid fa-clock-rotate-left"></i> Historial de Servicios</h2>
-                        <div class="historial">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Trabajo</th>
-                                        <th>Repuestos</th>
-                                        <th>KM</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="historial-tbody">
-                                    <tr><td colspan="4">Sin datos</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-                </div>
-            </div>
-
-            <div id="view-agendar" class="content-view">
-                <div style="max-width: 600px; margin: 0 auto;">
-                    <section class="card agendar">
-                        <h2><i class="fa-solid fa-calendar-days"></i> Solicitar Nueva Hora</h2>
-                        <form id="form-agendar">
-                            <label>Selecciona Fecha:</label>
-                            <input type="date" id="fecha-cita-dia" required>
-                            
-                            <label>Selecciona Hora (09:00 - 18:00):</label>
-                            <select id="fecha-cita-hora" required>
-                                <option value="">-- Elige un bloque --</option>
-                                <option value="09:00">09:00 AM</option><option value="10:00">10:00 AM</option>
-                                <option value="11:00">11:00 AM</option><option value="12:00">12:00 PM</option>
-                                <option value="13:00">01:00 PM</option><option value="14:00">02:00 PM</option>
-                                <option value="15:00">03:00 PM</option><option value="16:00">04:00 PM</option>
-                                <option value="17:00">05:00 PM</option>
-                            </select>
-                            
-                            <label>Motivo de la visita:</label>
-                            <input type="text" id="servicio-cita" placeholder="Ej: Cambio de aceite, Revisión frenos..." required>
-                            
-                            <button type="submit" class="btn-confirmar" style="margin-top: 1.5rem;">
-                                <i class="fa-solid fa-paper-plane"></i> Enviar Solicitud
-                            </button>
-                        </form>
-                    </section>
-                </div>
-            </div>
-
+            <div id="view-dashboard" class="content-view active"><div class="dashboard-grid-cliente"><section class="card"><h2><i class="fa-solid fa-list-check"></i> Mis Citas</h2><ul id="lista-estado-citas"><li><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</li></ul></section><section class="card sugerencia-card"><h2 style="color:#d35400;"><i class="fa-solid fa-bell"></i> Recordatorio</h2><div class="sugerencia-contenido" style="flex-direction:column; align-items:flex-start; gap:1rem;"><p id="proxima-sugerencia-texto" style="font-size:1.1rem;">Selecciona un vehículo...</p><button id="btn-agendar-sugerencia" class="btn-agendar-sugerencia" style="display:none;"><i class="fa-solid fa-calendar-check"></i> Agendar Ahora</button></div></section></div></div>
+            <div id="view-vehiculos" class="content-view"><div class="dashboard-grid"><section class="card"><h2><i class="fa-solid fa-car-side"></i> Seleccionar Vehículo</h2><select id="selector-vehiculo" class="selector-vehiculo"><option>Cargando...</option></select><div style="margin-top:1.5rem; padding:1rem; background:#f8f9fa; border-radius:8px;"><h3 id="vehiculo-nombre" style="margin:0; color:var(--secondary);"></h3><ul id="vehiculo-detalles" style="margin-top:0.5rem; color:var(--text-light);"></ul></div></section><section class="card"><h2><i class="fa-solid fa-clock-rotate-left"></i> Historial</h2><div class="historial"><table><thead><tr><th>Fecha</th><th>Trabajo</th><th>Repuestos</th><th>KM</th></tr></thead><tbody id="historial-tbody"><tr><td colspan="4">Sin datos</td></tr></tbody></table></div></section></div></div>
+            <div id="view-agendar" class="content-view"><div style="max-width:600px; margin:0 auto;"><section class="card agendar"><h2><i class="fa-solid fa-calendar-days"></i> Solicitar Nueva Hora</h2><form id="form-agendar"><label>Fecha:</label><input type="date" id="fecha-cita-dia" required><label>Hora:</label><select id="fecha-cita-hora" required><option value="">-- Elige --</option><option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option></select><label>Motivo:</label><input type="text" id="servicio-cita" required><button type="submit" class="btn-confirmar">Enviar</button></form></section></div></div>
         </main>
     </div>
-
     <script src="app.js"></script>
 </body>
 </html>

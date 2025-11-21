@@ -46,6 +46,29 @@ body {
 
 .logo-admin { height: 40px; width: auto; }
 .admin-header h2 { font-size: 1.2rem; font-weight: 600; color: var(--secondary); margin: 0; }
+.admin-header p { font-weight: 600; color: var(--primary); margin: 0; }
+
+/* --- NUEVO: ZONA DERECHA DEL HEADER (Reloj + Botón) --- */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.reloj-sistema {
+    text-align: right;
+    font-size: 0.85rem;
+    color: var(--text-light);
+    border-right: 1px solid var(--border);
+    padding-right: 1.5rem;
+    line-height: 1.2;
+}
+.reloj-sistema strong {
+    display: block;
+    color: var(--secondary);
+    font-size: 1rem;
+}
+/* ------------------------------------------------------ */
 
 .btn-logout {
     background: transparent;
@@ -80,7 +103,6 @@ body {
 .sidebar-nav { list-style: none; padding: 0; margin: 0; }
 .sidebar-nav li { margin-bottom: 0.2rem; }
 
-/* Links Sidebar */
 .sidebar-nav a {
     display: flex;
     justify-content: space-between;
@@ -178,7 +200,6 @@ button {
 }
 button:hover { background-color: #1a252f; transform: translateY(-1px); }
 
-/* Colores */
 .btn-confirmar, .btn-agendar-sugerencia, .btn-descargar, .btn-excel { background-color: var(--success); }
 .btn-confirmar:hover, .btn-agendar-sugerencia:hover { background-color: #218838; }
 
@@ -214,61 +235,13 @@ ul { list-style: none; padding: 0; margin: 0; }
 .list-item-label { cursor: pointer; font-weight: 500; flex-grow: 1; display: flex; align-items: center; gap: 10px; }
 .list-item-label:hover { color: var(--primary); }
 
-/* --- CONFIG LIST (MARCAS Y MODELOS - CORREGIDO) --- */
-.config-list {
-    max-height: 350px;
-    overflow-y: auto;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background-color: #fff;
-}
-
-.config-list li {
-    display: flex;
-    justify-content: space-between; /* Texto a izq, Botón a der */
-    align-items: center;            /* Centrado vertical */
-    padding: 0.6rem 1rem;
-    border-bottom: 1px solid var(--border);
-    transition: background-color 0.2s ease;
-    min-height: 40px;
-    box-sizing: border-box;
-    cursor: pointer;
-}
-
+.config-list { max-height: 350px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); background: white; }
+.config-list li { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); transition: background 0.2s; height: 50px; box-sizing: border-box; cursor: pointer; }
 .config-list li:last-child { border-bottom: none; }
 .config-list li:hover { background-color: #f8f9fa; }
-
-.config-list li.selected {
-    background-color: #e3f2fd;
-    border-left: 4px solid var(--info);
-    padding-left: calc(1rem - 4px);
-}
-
-/* Texto de la marca/modelo */
-.config-list li span {
-    flex-grow: 1;
-    font-weight: 500;
-    color: var(--text-main);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-right: 10px;
-}
-
-/* Botón de eliminar alineado */
-.config-list .btn-delete {
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 4px;
-    flex-shrink: 0;
-    font-size: 0.9rem;
-}
-/* -------------------------------------------------- */
+.config-list li.selected { background-color: #e3f2fd; border-left: 4px solid var(--info); padding-left: calc(1rem - 4px); }
+.config-list li span { flex-grow: 1; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 15px; }
+.config-list .btn-delete { width: 32px; height: 32px; padding: 0; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 4px; flex-shrink: 0; font-size: 0.9rem; }
 
 /* Status */
 .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
@@ -279,11 +252,11 @@ ul { list-style: none; padding: 0; margin: 0; }
 .status-rechazada { background-color: var(--danger); color: white; }
 
 /* Gráficos */
-.chart-container { padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius); }
-.chart-bar { display: flex; align-items: center; margin-bottom: 0.8rem; width: 100%; }
-.chart-label { width: 130px; text-align: right; padding-right: 15px; font-weight: 600; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
-.chart-track { flex-grow: 1; background: #f1f1f1; height: 24px; border-radius: 4px; overflow: hidden; }
-.chart-bar-inner { height: 100%; color: white; text-align: right; padding-right: 8px; font-weight: bold; font-size: 0.8rem; line-height: 24px; min-width: 30px; }
+.chart-container { padding: 1.5rem; background: #fff; border-radius: var(--radius); border: 1px solid var(--border); }
+.chart-bar { display: flex; align-items: center; margin-bottom: 1rem; width: 100%; }
+.chart-label { width: 140px; text-align: right; padding-right: 15px; font-weight: 600; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; color: var(--secondary); }
+.chart-track { flex-grow: 1; background: #f1f1f1; height: 26px; border-radius: 4px; overflow: hidden; }
+.chart-bar-inner { height: 100%; color: white; text-align: right; padding-right: 10px; font-weight: bold; font-size: 0.8rem; line-height: 26px; min-width: 40px; transition: width 1s ease; }
 
 /* Cliente Extras */
 .sugerencia-card { background-color: #fff8e1; border: 1px solid #fbc02d; }
@@ -294,11 +267,8 @@ ul { list-style: none; padding: 0; margin: 0; }
 /* Modales */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 1000; }
 .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: var(--radius); z-index: 1001; width: 95%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-.visible { display: block; }
-.hidden { display: none; }
-.close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: var(--text-light); }
+.visible { display: block; } .hidden { display: none; } .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: var(--text-light); }
 
-/* Responsividad */
 @media (max-width: 992px) {
     .admin-layout, .page-layout { display: block; }
     .sidebar { position: static; width: 100%; height: auto; display: flex; overflow-x: auto; padding: 10px; background: var(--secondary); }
