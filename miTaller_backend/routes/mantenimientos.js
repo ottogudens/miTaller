@@ -2,112 +2,78 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../database.js');
 
-// Middleware Anti-Caché
 const noCache = (req, res, next) => {
     res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
     next();
 };
 
-// ============================================================
-// 1. RUTAS ESPECÍFICAS (Buscador)
-// ============================================================
-
-router.get('/buscar/global', noCache, async (req, res) => {
-    let query = req.query.q || '';
+// CREAR MANTENIMIENTO (Con Transacción para Stock)
+router.post('/', async (req, res) => {
+    const { fecha, kilometraje, trabajos_realizados, repuestos_usados, proxima_sugerencia, proximo_km_sugerido, vehiculo_id, items } = req.body;
     
     try {
-        // --- LÓGICA DE CONVERSIÓN DE FECHA (DD-MM-YYYY -> YYYY-MM-DD) ---
-        const fechaRegex = /^(\d{2})-(\d{2})-(\d{4})$/; // Detecta 20-11-2024
-        const match = query.match(fechaRegex);
-        
-        let terminoBusqueda = query;
+        await db.transaction(async (trx) => {
+            let totalServicio = 0;
+            if (items && items.length > 0) {
+                items.forEach(i => { totalServicio += (i.precio * i.cantidad); });
+            }
 
-        if (match) {
-            // Si es fecha chilena, la invertimos para la BD
-            const [_, dia, mes, anio] = match;
-            terminoBusqueda = `${anio}-${mes}-${dia}`;
-        }
-        // ---------------------------------------------------------------
+            const [mantenimientoId] = await trx('mantenimientos').insert({
+                fecha, kilometraje, trabajos_realizados, repuestos_usados,
+                proxima_sugerencia, proximo_km_sugerido, vehiculo_id,
+                total_servicio: totalServicio
+            }); // SQLite devuelve ID en array
 
-        let baseQuery = db('mantenimientos')
-            .join('vehiculos', 'mantenimientos.vehiculo_id', 'vehiculos.id')
-            .join('clientes', 'vehiculos.cliente_id', 'clientes.id')
-            .select(
-                'mantenimientos.*',
-                'vehiculos.patente',
-                'vehiculos.marca',
-                'vehiculos.modelo',
-                'clientes.nombre as cliente_nombre'
-            )
-            .orderBy('mantenimientos.fecha', 'desc');
+            // Procesar items y stock
+            if (items && items.length > 0) {
+                // Obtenemos el ID correcto dependiendo del driver de SQLite
+                const mId = typeof mantenimientoId === 'object' ? mantenimientoId.id : mantenimientoId;
 
-        if (terminoBusqueda) {
-            baseQuery = baseQuery.where(function() {
-                this.where('vehiculos.patente', 'like', `%${terminoBusqueda}%`)
-                    .orWhere('clientes.nombre', 'like', `%${terminoBusqueda}%`)
-                    .orWhere('mantenimientos.fecha', 'like', `%${terminoBusqueda}%`);
-            });
-        } else {
-            baseQuery = baseQuery.limit(50);
-        }
+                for (const item of items) {
+                    await trx('mantenimiento_items').insert({
+                        mantenimiento_id: mId,
+                        producto_id: item.id,
+                        cantidad: item.cantidad,
+                        precio_unitario: item.precio,
+                        subtotal: item.precio * item.cantidad
+                    });
 
-        const resultados = await baseQuery;
-        res.json(resultados);
-
-    } catch (error) {
-        console.error("Error búsqueda global:", error);
-        res.status(500).json({ error: 'Error al buscar mantenimientos' });
-    }
-});
-
-
-// ============================================================
-// 2. RUTAS CRUD ESTÁNDAR
-// ============================================================
-
-// [C]REATE
-router.post('/', async (req, res) => {
-    const { fecha, kilometraje, trabajos_realizados, repuestos_usados, proxima_sugerencia, proximo_km_sugerido, vehiculo_id } = req.body;
-    try {
-        const [id] = await db('mantenimientos').insert({
-            fecha, kilometraje, trabajos_realizados, repuestos_usados, proxima_sugerencia, proximo_km_sugerido, vehiculo_id
+                    if (item.categoria !== 'Servicio') {
+                        await trx('productos').where({ id: item.id }).decrement('stock', item.cantidad);
+                    }
+                }
+            }
         });
-        res.status(201).json({ id, message: 'Mantenimiento registrado' });
+        res.status(201).json({ message: 'Mantenimiento registrado' });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error al registrar mantenimiento' });
     }
 });
 
-// [R]EAD: Por ID (IMPORTANTE: Debe ir DESPUÉS de /buscar/global)
-router.get('/:id', noCache, async (req, res) => {
+// Buscador Global
+router.get('/buscar/global', noCache, async (req, res) => {
+    let query = req.query.q || '';
+    const fechaRegex = /^(\d{2})-(\d{2})-(\d{4})$/; 
+    const match = query.match(fechaRegex);
+    let tb = query; if (match) { const [_, d, m, a] = match; tb = `${a}-${m}-${d}`; }
+
     try {
-        const m = await db('mantenimientos').where({id: req.params.id}).first();
-        if (m) res.json(m);
-        else res.status(404).json({ error: 'No encontrado' });
-    } catch (e) { res.status(500).json({ error: 'Error al obtener' }); }
+        let q = db('mantenimientos')
+            .join('vehiculos', 'mantenimientos.vehiculo_id', 'vehiculos.id')
+            .join('clientes', 'vehiculos.cliente_id', 'clientes.id')
+            .select('mantenimientos.*', 'vehiculos.patente', 'vehiculos.marca', 'vehiculos.modelo', 'clientes.nombre as cliente_nombre')
+            .orderBy('mantenimientos.fecha', 'desc');
+
+        if (tb) q.where(function() { this.where('vehiculos.patente', 'like', `%${tb}%`).orWhere('clientes.nombre', 'like', `%${tb}%`).orWhere('mantenimientos.fecha', 'like', `%${tb}%`); });
+        else q.limit(50);
+        const r = await q; res.json(r);
+    } catch (e) { res.status(500).json({ error: 'Error' }); }
 });
 
-// [U]PDATE
-router.put('/:id', async (req, res) => {
-    const { fecha, kilometraje, trabajos_realizados, repuestos_usados, proxima_sugerencia, proximo_km_sugerido } = req.body;
-    try {
-        await db('mantenimientos').where({ id: req.params.id }).update({
-            fecha, kilometraje, trabajos_realizados, repuestos_usados, proxima_sugerencia, proximo_km_sugerido
-        });
-        res.json({ message: 'Mantenimiento actualizado' });
-    } catch (error) {
-        res.status(500).json({ error: 'Error al actualizar' });
-    }
-});
-
-// [D]ELETE
-router.delete('/:id', async (req, res) => {
-    try {
-        await db('mantenimientos').where({ id: req.params.id }).del();
-        res.json({ message: 'Eliminado' });
-    } catch (error) {
-        res.status(500).json({ error: 'Error al eliminar' });
-    }
-});
+// Get, Put, Delete simples
+router.get('/:id', noCache, async (req, res) => { try { const m = await db('mantenimientos').where({id: req.params.id}).first(); res.json(m); } catch (e) { res.status(500).json({error:'Error'}); } });
+router.put('/:id', async (req, res) => { try { await db('mantenimientos').where({id: req.params.id}).update(req.body); res.json({msg:'Ok'}); } catch (e) { res.status(500).json({error:'Error'}); } });
+router.delete('/:id', async (req, res) => { try { await db('mantenimientos').where({id: req.params.id}).del(); res.json({msg:'Ok'}); } catch (e) { res.status(500).json({error:'Error'}); } });
 
 module.exports = router;
