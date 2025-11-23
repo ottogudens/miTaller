@@ -1,0 +1,156 @@
+¡Claro que sí\! Aquí tienes una propuesta profesional para el archivo `README.md` de tu proyecto **GUDEX**.
+
+Este documento está diseñado para que cualquier desarrollador (o tú mismo en el futuro) pueda entender, instalar y desplegar el proyecto rápidamente.
+
+-----
+
+# 🚗 GUDEX - Sistema de Gestión para Taller Mecánico
+
+**GUDEX** es una aplicación web integral diseñada para la administración eficiente de un taller mecánico (Lubricentro y Serviteca). Permite la gestión completa del flujo de trabajo, desde la recepción del vehículo y el agendamiento de citas, hasta el control de inventario y la generación de reportes técnicos.
+
+La plataforma cuenta con dos portales diferenciados:
+
+1.  **Panel Administrativo:** Para el personal del taller (Recepción, Mecánicos, Gerencia).
+2.  **Portal del Cliente:** Para que los usuarios agenden horas y revisen su historial.
+
+-----
+
+## 🚀 Características Principales
+
+### 🔧 Panel de Administración
+
+  * **Dashboard de Citas:** Vista en tiempo real de citas pendientes, confirmadas y terminadas.
+  * **Flujo de Taller:** Conversión automática de citas finalizadas a órdenes de trabajo.
+  * **Gestión de Clientes y Vehículos:** Base de datos completa con historial de mantenimientos.
+  * **Inventario y Stock:** Control de productos físicos (con escaneo de código de barras) y catálogo de servicios.
+  * **Recepción Vehicular:** Buscador rápido por patente para ingresos ágiles.
+  * **Reportes:** Generación de Fichas Técnicas en PDF y estadísticas gráficas.
+  * **Herramientas:** Respaldo de base de datos y carga masiva vía Excel.
+
+### 👤 Portal del Cliente
+
+  * **Autogestión:** Agendamiento de horas en línea.
+  * **Mi Garaje:** Visualización de vehículos registrados y su estado.
+  * **Historial:** Acceso y descarga de informes de mantenimientos pasados (PDF).
+  * **Recordatorios:** Avisos automáticos de próximas mantenciones sugeridas.
+
+-----
+
+## 🛠️ Tecnologías Utilizadas
+
+### Backend (API REST)
+
+  * **Runtime:** Node.js
+  * **Framework:** Express.js
+  * **Base de Datos:** SQLite3 (Ligera y portable)
+  * **ORM/Query Builder:** Knex.js
+  * **Seguridad:** JWT (Json Web Tokens) y Bcrypt (Hashing de contraseñas)
+  * **Documentación:** Swagger (OpenAPI 3.0)
+  * **Utilidades:** PDFKit (Reportes), ExcelJS (Carga masiva), Multer (Subida de archivos)
+
+### Frontend
+
+  * **Core:** HTML5, CSS3, JavaScript (ES6 Modules).
+  * **Arquitectura:** Modular (Controladores, Servicios API, Router SPA).
+  * **UI/UX:** Diseño propio con CSS (`admin.css`, `login.css`), SweetAlert2 (Notificaciones), FontAwesome (Iconos).
+
+-----
+
+## 📦 Instalación y Despliegue
+
+### Prerrequisitos
+
+  * Node.js (v18 o superior recomedado)
+  * NPM
+
+### Pasos de Instalación
+
+1.  **Clonar el repositorio:**
+
+    ```bash
+    git clone https://github.com/tu-usuario/gudex.git
+    cd gudex
+    ```
+
+2.  **Instalar dependencias del Backend:**
+
+    ```bash
+    cd miTaller_backend
+    npm install
+    ```
+
+3.  **Configurar Variables de Entorno:**
+    Crea un archivo `.env` en la carpeta `miTaller_backend/` con el siguiente contenido:
+
+    ```env
+    PORT=3000
+    JWT_SECRET=TU_CLAVE_SECRETA_SEGURA_AQUI
+    NODE_ENV=development
+    ```
+
+4.  **Inicializar la Base de Datos:**
+    El sistema crea automáticamente el archivo `gudex_serviteca.db` y las tablas necesarias al arrancar por primera vez.
+
+5.  **Iniciar el Servidor:**
+
+    ```bash
+    # Modo desarrollo
+    node server.js
+
+    # Modo producción (con PM2)
+    pm2 start server.js --name "gudex-api"
+    ```
+
+6.  **Desplegar el Frontend:**
+    Sirve la carpeta raíz (`miTaller/`) utilizando un servidor web como **Nginx** o Apache.
+
+      * **Nota:** Debes configurar un proxy inverso en tu servidor web para redirigir las peticiones `/api` hacia `http://localhost:3000`.
+
+-----
+
+## 📖 Documentación de la API
+
+El proyecto incluye documentación interactiva generada con Swagger. Una vez iniciado el servidor backend, puedes acceder a ella en:
+
+👉 **http://localhost:3000/api-docs**
+
+Desde allí podrás probar todos los endpoints (Login, Productos, Clientes) y ver los esquemas de datos requeridos.
+
+-----
+
+## 📂 Estructura del Proyecto
+
+```text
+gudex/
+├── miTaller_backend/       # API REST (Node.js)
+│   ├── database.js         # Configuración SQLite
+│   ├── server.js           # Punto de entrada
+│   ├── routes/             # Endpoints de la API
+│   ├── controllers/        # (Lógica de negocio opcional)
+│   └── middleware/         # Autenticación y seguridad
+│
+└── miTaller/               # Frontend (Estático)
+    ├── index.html          # Portal Cliente
+    ├── admin.html          # Panel Admin
+    ├── css/                # Estilos
+    └── js/
+        ├── admin-core.js   # Lógica principal Admin
+        ├── client-core.js  # Lógica principal Cliente
+        ├── modules/        # API, Router, UI (Reutilizables)
+        └── controllers/    # Lógica específica por vista
+```
+
+-----
+
+## 🛡️ Seguridad y Buenas Prácticas
+
+  * **Credenciales:** Nunca subas el archivo `.env` al repositorio.
+  * **Datos:** La base de datos SQLite se encuentra localmente. Asegúrate de realizar respaldos periódicos desde el panel de administración.
+  * **Sesiones:** Los tokens JWT tienen caducidad automática para proteger las sesiones de usuario.
+
+-----
+
+## 📄 Licencia
+
+Este proyecto es propiedad de **GUDEX Serviteca**.
+Desarrollado con ❤️ y JavaScript.
