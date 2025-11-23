@@ -6,10 +6,10 @@
     <title>GUDEX - Mi Perfil</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="admin.css"> 
 </head>
 <body>
-    
     <header class="admin-header">
         <img src="logorojo.png" alt="GUDEX" class="logo-admin">
         <div class="header-right">
@@ -28,11 +28,17 @@
             </ul>
         </nav>
         <main class="main-content">
-            <div id="view-dashboard" class="content-view active"><div class="dashboard-grid-cliente"><section class="card"><h2><i class="fa-solid fa-list-check"></i> Mis Citas</h2><ul id="lista-estado-citas"><li><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</li></ul></section><section class="card sugerencia-card"><h2 style="color:#d35400;"><i class="fa-solid fa-bell"></i> Recordatorio</h2><div class="sugerencia-contenido" style="flex-direction:column; align-items:flex-start; gap:1rem;"><p id="proxima-sugerencia-texto" style="font-size:1.1rem;">Selecciona un vehículo...</p><button id="btn-agendar-sugerencia" class="btn-agendar-sugerencia" style="display:none;"><i class="fa-solid fa-calendar-check"></i> Agendar Ahora</button></div></section></div></div>
+            <div id="view-dashboard" class="content-view active">
+                <div class="dashboard-grid-cliente">
+                    <section class="card"><h2><i class="fa-solid fa-list-check"></i> Mis Citas</h2><ul id="lista-estado-citas"><li><i class="fa-solid fa-spinner fa-spin"></i> Cargando...</li></ul></section>
+                    <section class="card sugerencia-card"><h2 style="color:#d35400;"><i class="fa-solid fa-bell"></i> Recordatorio</h2><div class="sugerencia-contenido" style="flex-direction:column; align-items:flex-start; gap:1rem;"><p id="proxima-sugerencia-texto" style="font-size:1.1rem;">Selecciona un vehículo...</p><button id="btn-agendar-sugerencia" class="btn-agendar-sugerencia" style="display:none;"><i class="fa-solid fa-calendar-check"></i> Agendar Ahora</button></div></section>
+                    <section class="card" style="background-color: #f8f9fa; border: 1px solid #e9ecef;"><h2 style="color: var(--secondary);"><i class="fa-solid fa-file-pdf"></i> Mi Carpeta</h2><p style="color: var(--text-light); margin-bottom: 1rem;">Descarga el historial completo.</p><button id="btn-descargar-ficha" class="btn-descargar" style="width: 100%;"><i class="fa-solid fa-download"></i> Descargar Ficha Técnica</button></section>
+                </div>
+            </div>
             <div id="view-vehiculos" class="content-view"><div class="dashboard-grid"><section class="card"><h2><i class="fa-solid fa-car-side"></i> Seleccionar Vehículo</h2><select id="selector-vehiculo" class="selector-vehiculo"><option>Cargando...</option></select><div style="margin-top:1.5rem; padding:1rem; background:#f8f9fa; border-radius:8px;"><h3 id="vehiculo-nombre" style="margin:0; color:var(--secondary);"></h3><ul id="vehiculo-detalles" style="margin-top:0.5rem; color:var(--text-light);"></ul></div></section><section class="card"><h2><i class="fa-solid fa-clock-rotate-left"></i> Historial</h2><div class="historial"><table><thead><tr><th>Fecha</th><th>Trabajo</th><th>Repuestos</th><th>KM</th></tr></thead><tbody id="historial-tbody"><tr><td colspan="4">Sin datos</td></tr></tbody></table></div></section></div></div>
             <div id="view-agendar" class="content-view"><div style="max-width:600px; margin:0 auto;"><section class="card agendar"><h2><i class="fa-solid fa-calendar-days"></i> Solicitar Nueva Hora</h2><form id="form-agendar"><label>Fecha:</label><input type="date" id="fecha-cita-dia" required><label>Hora:</label><select id="fecha-cita-hora" required><option value="">-- Elige --</option><option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option><option value="12:00">12:00</option><option value="13:00">13:00</option><option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option></select><label>Motivo:</label><input type="text" id="servicio-cita" required><button type="submit" class="btn-confirmar">Enviar</button></form></section></div></div>
         </main>
     </div>
-    <script src="app.js"></script>
+    <script type="module" src="js/client-core.js"></script>
 </body>
 </html>

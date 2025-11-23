@@ -3,29 +3,33 @@ const cors = require('cors');
 const { inicializarBaseDeDatos } = require('./database.js');
 const { protegerRuta, soloAdmin } = require('./middleware/auth.js');
 
+// --- SWAGGER ---
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger.js');
+
 // --- IMPORTAR RUTAS ---
 const authRoutes = require('./routes/auth.js');
 const clienteRoutes = require('./routes/clientes.js');
 const vehiculoRoutes = require('./routes/vehiculos.js');
 const citaRoutes = require('./routes/citas.js');
 const mantenimientoRoutes = require('./routes/mantenimientos.js');
-const vehiculosDataRoutes = require('./routes/vehiculos-data.js'); // Marcas/Modelos
+const vehiculosDataRoutes = require('./routes/vehiculos-data.js');
 const statsRoutes = require('./routes/stats.js');
 const backupRoutes = require('./routes/backup.js');
 const excelRoutes = require('./routes/excel.js');
 const reportsRoutes = require('./routes/reports.js');
-const productosRoutes = require('./routes/productos.js');    // Inventario
-const proveedoresRoutes = require('./routes/proveedores.js'); // Proveedores
-const categoriasRoutes = require('./routes/categorias.js');   // Categorías Productos
+const productosRoutes = require('./routes/productos.js');
+const proveedoresRoutes = require('./routes/proveedores.js');
+const categoriasRoutes = require('./routes/categorias.js');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// --- MIDDLEWARES GLOBALES ---
+// --- MIDDLEWARES ---
 app.use(express.json());
 app.use(cors({ exposedHeaders: ['Content-Disposition'] }));
 
-// Anti-Caché Global (Previene error 304)
+// Anti-Caché Global
 app.use((req, res, next) => {
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
     res.set('Expires', '-1');
@@ -33,26 +37,29 @@ app.use((req, res, next) => {
     next();
 });
 
+// --- DOCUMENTACIÓN ---
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // --- INICIO ---
 async function iniciarServidor() {
     try {
-        // 1. Crear/Verificar Tablas
         await inicializarBaseDeDatos();
 
-        // 2. Rutas Públicas
+        // Rutas Públicas
         app.use('/api/auth', authRoutes);
-        app.get('/', (req, res) => res.send('Servidor GUDEX v5.0 (Full ERP) Operativo'));
+        app.get('/', (req, res) => res.send('Servidor GUDEX Operativo. Docs en /api-docs'));
 
-        // 3. Rutas Admin (Configuración y Gestión)
+        // Rutas Admin
         app.use('/api/stats', protegerRuta, soloAdmin, statsRoutes);
         app.use('/api/backup', protegerRuta, soloAdmin, backupRoutes);
         app.use('/api/excel', protegerRuta, soloAdmin, excelRoutes);
-        app.use('/api/reports', protegerRuta, soloAdmin, reportsRoutes);
         app.use('/api/productos', protegerRuta, soloAdmin, productosRoutes);
         app.use('/api/proveedores', protegerRuta, soloAdmin, proveedoresRoutes);
         app.use('/api/categorias', protegerRuta, soloAdmin, categoriasRoutes);
 
-        // 4. Rutas Operativas (Admin y Cliente)
+        // Rutas Operativas (Admin y Cliente)
+        // Reportes se protege con token, pero el archivo reports.js valida si eres dueño o admin
+        app.use('/api/reports', protegerRuta, reportsRoutes); 
         app.use('/api/clientes', protegerRuta, clienteRoutes);
         app.use('/api/vehiculos', protegerRuta, vehiculoRoutes);
         app.use('/api/citas', protegerRuta, citaRoutes);
@@ -61,6 +68,7 @@ async function iniciarServidor() {
 
         app.listen(PORT, () => {
             console.log(`🚀 Servidor iniciado en http://localhost:${PORT}`);
+            console.log(`📚 Documentación disponible en http://localhost:${PORT}/api-docs`);
         });
 
     } catch (error) {

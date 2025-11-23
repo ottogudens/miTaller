@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
-// Asegúrate de que esta clave sea IGUAL a la de routes/auth.js
-const SECRET_KEY = 'tu_secreto_super_seguro'; 
+
+// Seguridad: Usar variable de entorno. Fallback solo para desarrollo.
+const SECRET_KEY = process.env.JWT_SECRET || 'clave_insegura_fallback';
 
 const protegerRuta = (req, res, next) => {
     let token = null;
@@ -11,23 +12,21 @@ const protegerRuta = (req, res, next) => {
         token = authHeader.split(' ')[1];
     }
 
-    // 2. Si no hay header, intentar leer de la URL '?token=<token>' (Para descargas)
+    // 2. Si no hay header, intentar leer de la URL (Para descargas de PDF/Excel)
     if (!token && req.query && req.query.token) {
         token = req.query.token;
     }
 
-    // 3. Si después de ambos intentos no hay token, rechazar
     if (!token) {
         return res.status(401).json({ error: 'Acceso denegado: Token no proporcionado.' });
     }
 
-    // 4. Verificar el token
     jwt.verify(token, SECRET_KEY, (err, user) => {
         if (err) {
             return res.status(403).json({ error: 'Acceso denegado: Token inválido o expirado.' });
         }
         req.user = user; // Guardamos los datos del usuario en la petición
-        next(); // Continuamos
+        next();
     });
 };
 

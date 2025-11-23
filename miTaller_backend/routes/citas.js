@@ -4,7 +4,6 @@ const { db } = require('../database.js');
 
 router.post('/', async (req, res) => {
     const { fecha_cita, servicio_solicitado, cliente_id, vehiculo_id } = req.body;
-    // Validación simple de duplicados
     const existe = await db('citas').where({ fecha_cita }).whereIn('estado', ['Pendiente', 'Confirmada']).first();
     if (existe) return res.status(409).json({ error: 'Horario ocupado' });
     
